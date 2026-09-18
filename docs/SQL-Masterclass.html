@@ -1,0 +1,2717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL Masterclass — From First Query to Production Thinking</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,'Helvetica Neue',Arial,sans-serif;
+    background:#e9ebf4;color:#1d2438;line-height:1.65;font-size:15.5px;
+  }
+  ::selection{background:#d8d3ff}
+
+  /* ---------- pages ---------- */
+  .page{
+    position:relative;width:min(1040px,96vw);margin:28px auto;background:#fff;
+    border-radius:18px;box-shadow:0 12px 44px rgba(23,28,60,.10);
+    padding:58px 66px 42px;overflow:hidden;
+  }
+  @media (max-width:760px){.page{padding:30px 22px 26px}}
+
+  /* ---------- cover ---------- */
+  .cover{
+    display:flex;flex-direction:column;justify-content:center;min-height:92vh;color:#fff;
+    background:
+      radial-gradient(900px 480px at 88% -8%, rgba(255,122,184,.35), transparent 60%),
+      radial-gradient(700px 420px at -10% 108%, rgba(64,220,255,.22), transparent 55%),
+      linear-gradient(135deg,#0e0c26 0%, #221a5e 34%, #5527d8 62%, #a92ee8 82%, #ef4fb0 100%);
+  }
+  .cover::before{
+    content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(720px 520px at 78% 18%, #000 30%, transparent 75%);
+    -webkit-mask-image:radial-gradient(720px 520px at 78% 18%, #000 30%, transparent 75%);
+  }
+  .ghost{
+    position:absolute;right:-30px;bottom:-120px;font-size:330px;font-weight:900;letter-spacing:-.02em;
+    color:rgba(255,255,255,.055);line-height:1;user-select:none;pointer-events:none;font-family:Georgia,serif;font-style:italic;
+  }
+  .kwchip{
+    position:absolute;border:1px solid rgba(255,255,255,.28);border-radius:999px;
+    padding:7px 18px;font-size:13px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.82);
+    background:rgba(255,255,255,.07);backdrop-filter:blur(4px);pointer-events:none;font-family:Consolas,monospace;
+  }
+  .cv-inner{position:relative;max-width:760px}
+  .cv-chip{
+    display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.35);
+    border-radius:999px;padding:7px 18px;font-size:11.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+    color:#ffd9f2;background:rgba(255,255,255,.08);margin-bottom:26px;
+  }
+  .cv-chip::before{content:'';width:8px;height:8px;border-radius:50%;background:#7dfad2;box-shadow:0 0 12px #7dfad2}
+  .cv-title{font-size:clamp(56px,9vw,96px);font-weight:900;line-height:1.02;letter-spacing:-.02em}
+  .cv-title .grad{
+    background:linear-gradient(92deg,#ffffff 10%,#ffd9f3 45%,#a5f0ff 90%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .cv-title small{display:block;font-size:clamp(24px,3.4vw,40px);font-weight:800;color:rgba(255,255,255,.92);letter-spacing:.28em;margin-top:8px}
+  .cv-sub{margin-top:26px;font-size:17.5px;color:rgba(255,255,255,.85);max-width:640px}
+  .cv-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
+  .stat{
+    background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.22);border-radius:14px;
+    padding:14px 22px;min-width:120px;backdrop-filter:blur(6px);
+  }
+  .stat b{display:block;font-size:24px;font-weight:800;color:#fff}
+  .stat span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.65)}
+  .cv-meta{
+    position:relative;margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,.22);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:13px;color:rgba(255,255,255,.72);letter-spacing:.06em;
+  }
+  .cv-scroll{margin-top:34px;font-size:13px;color:rgba(255,255,255,.65);letter-spacing:.1em}
+
+  /* ---------- headers & footers ---------- */
+  .phead{margin-bottom:26px}
+  .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .pchip{
+    background:linear-gradient(90deg,#5b4df0,#c44df0);color:#fff;font-size:10.5px;font-weight:800;
+    letter-spacing:.18em;text-transform:uppercase;padding:5px 14px;border-radius:999px;white-space:nowrap;
+  }
+  .pchip.proj{background:linear-gradient(90deg,#0e9f6e,#0fb5ba)}
+  .eyebrow .cn{font-size:12px;font-weight:700;color:#8a90ad;letter-spacing:.2em;text-transform:uppercase}
+  h1{font-size:34px;line-height:1.2;letter-spacing:-.01em;color:#171d3a}
+  h1 .gt,h2 .gt{
+    background:linear-gradient(90deg,#5b4df0,#b44df0,#e84ac0);
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-style:normal;
+  }
+  .lede{margin-top:12px;font-size:16.5px;color:#4c5470;max-width:780px}
+  h2{font-size:21.5px;margin:36px 0 12px;color:#1c2344;padding-bottom:9px;
+     background:linear-gradient(90deg,#5b4df0,#e84ac0) left bottom/64px 4px no-repeat}
+  h3{font-size:16.5px;margin:22px 0 8px;color:#2a3158}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0 10px 24px}
+  li{margin:5px 0}
+  mark{background:linear-gradient(transparent 52%,#ffe08a 52%);padding:0 2px;border-radius:2px}
+  .ic{
+    background:#eef0fb;border:1px solid #e3e6f5;border-radius:6px;padding:1px 7px;
+    font-family:'Cascadia Code',Consolas,monospace;font-size:.9em;color:#4436b8;white-space:nowrap;
+  }
+  hr.divider{border:none;height:1px;background:linear-gradient(90deg,transparent,#d9dcef,transparent);margin:30px 0}
+
+  .pfoot{
+    display:flex;justify-content:space-between;align-items:center;margin-top:46px;padding-top:16px;
+    border-top:1px solid #eceef8;font-size:12px;color:#9aa0bd;
+  }
+  .pfoot .fp{background:#f2f3fb;padding:3px 13px;border-radius:999px;font-weight:700;color:#5b5f80}
+
+  /* ---------- callouts ---------- */
+  .co{border-radius:12px;padding:14px 20px 13px;margin:18px 0;border:1px solid;border-left-width:5px}
+  .co .cot{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;display:flex;gap:8px;align-items:center}
+  .co p{margin:6px 0}
+  .co ul,.co ol{margin-left:20px}
+  .co.deep{background:#f2f1ff;border-color:#d9d5ff;color:#3b357e}.co.deep .cot{color:#5b4df0}
+  .co.tip{background:#effcf5;border-color:#c9ecd9;color:#14603c}.co.tip .cot{color:#0e9f6e}
+  .co.warn{background:#fff8ec;border-color:#f5e3bd;color:#7a5205}.co.warn .cot{color:#d97706}
+  .co.story{background:#fdf1fa;border-color:#f6d4ee;color:#7c2a68}.co.story .cot{color:#d23f9f}
+
+  /* ---------- code ---------- */
+  .codewrap{margin:16px 0;border-radius:12px;overflow:hidden;box-shadow:0 8px 26px rgba(18,22,54,.16)}
+  .cbar{
+    display:flex;justify-content:space-between;align-items:center;background:#171d3d;color:#aab1d6;
+    padding:7px 16px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  }
+  .cbar .clang{color:#8f9bff;font-weight:800}
+  .cbar .csrc{color:#f0a6d8}
+  pre.sql,pre.out{
+    font-family:'Cascadia Code',ui-monospace,Consolas,'Courier New',monospace;
+    font-size:13px;line-height:1.75;padding:16px 20px;overflow-x:auto;tab-size:4;
+  }
+  pre.sql{background:#10162f;color:#e8ebff}
+  pre.out{background:#0b0f22;color:#c8cfee;font-size:12.5px;line-height:1.6}
+  .kw{color:#7fb4ff;font-weight:600}.fn{color:#ffc66d}.st{color:#a5e07f}.nu{color:#ff9db4}.cm{color:#7c85ad;font-style:italic}
+
+  /* ---------- reference tables ---------- */
+  table.ref{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+  .ref th{
+    background:linear-gradient(90deg,#221c4e,#3c2a86);color:#fff;text-align:left;padding:9px 13px;
+    font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  }
+  .ref th:first-child{border-radius:10px 0 0 0}.ref th:last-child{border-radius:0 10px 0 0}
+  .ref td{padding:9px 13px;border-bottom:1px solid #ecedf6;vertical-align:top;color:#333a5c}
+  .ref tr:nth-child(even) td{background:#f8f9fe}
+  .ref td code,.ref th code{font-family:'Cascadia Code',Consolas,monospace;font-size:.92em;color:#4436b8}
+
+  /* ---------- toc ---------- */
+  .toc-part{display:flex;align-items:center;gap:12px;margin:30px 0 6px}
+  .toc-part .pt{font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+    background:linear-gradient(90deg,#5b4df0,#e84ac0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .toc-part .pl{flex:1;height:1px;background:linear-gradient(90deg,#d9dcef,transparent)}
+  .toc-row{display:flex;align-items:baseline;gap:12px;padding:7px 2px;text-decoration:none;color:inherit}
+  .toc-row:hover .t{color:#5b4df0}
+  .toc-row .no{
+    flex:none;width:36px;height:26px;border-radius:8px;text-align:center;line-height:26px;
+    background:linear-gradient(135deg,#efefff,#f9e9fb);color:#5b4df0;font-weight:800;font-size:12px;
+  }
+  .toc-row .t{font-weight:650;font-size:15px}
+  .toc-row .dots{flex:1;border-bottom:2px dotted #cfd4ea;transform:translateY(-4px)}
+  .toc-row .pg{color:#8a90ad;font-size:13px;font-weight:700}
+
+  /* ---------- exercises ---------- */
+  .ex{background:#f7f8ff;border:1px solid #e6e9fb;border-radius:14px;padding:16px 22px;margin:16px 0}
+  .ex .exh{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8a90ad;margin-bottom:6px}
+  .ex .exq{font-weight:650;color:#232a52;margin:8px 0 2px}
+  details.sol{margin-top:10px}
+  details.sol summary{cursor:pointer;font-weight:800;color:#5b4df0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;user-select:none}
+  details.sol[open] summary{margin-bottom:6px}
+
+  /* ---------- diagrams ---------- */
+  .flow{display:flex;flex-direction:column;gap:6px;margin:20px auto;max-width:470px}
+  .fstep{display:flex;align-items:center;gap:14px;background:#f6f7ff;border:1px solid #e6e9fb;border-radius:12px;padding:9px 18px}
+  .fstep .n{flex:none;width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,#5b4df0,#b44df0);
+    color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .fstep .code{font-weight:700;color:#2c2f6b;font-family:'Cascadia Code',Consolas,monospace;font-size:14px}
+  .fstep .why{margin-left:auto;font-size:12.5px;color:#8a90ad;text-align:right}
+  .farrow{text-align:center;color:#b9bede;font-size:14px;line-height:1;margin:-1px 0}
+  .dgm{display:block;margin:18px auto;max-width:100%}
+  .venns{display:flex;flex-wrap:wrap;gap:26px;justify-content:center;margin:20px 0}
+  .vencard{text-align:center;background:#f8f9fe;border:1px solid #e8eaf6;border-radius:14px;padding:14px 18px 10px}
+  .vencard .vt{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#3c4270;margin-bottom:4px}
+  .vencard .vd{font-size:12px;color:#8a90ad}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:820px){.grid2{grid-template-columns:1fr}}
+
+  .pill{display:inline-block;background:#eef0fb;border:1px solid #e0e3f4;color:#4436b8;border-radius:999px;
+    padding:2px 12px;font-size:12px;font-weight:700;margin:2px 3px 2px 0}
+
+  ul.tick{list-style:none;margin-left:6px}
+  ul.tick li{padding-left:26px;position:relative}
+  ul.tick li::before{content:'✓';position:absolute;left:0;top:0;color:#0e9f6e;font-weight:800}
+
+  /* ---------- cheatsheet ---------- */
+  .cheat{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:820px){.cheat{grid-template-columns:1fr}}
+  .cheat .cbox{border:1px solid #e6e9fb;border-radius:14px;overflow:hidden}
+  .cheat .cht{background:linear-gradient(90deg,#221c4e,#3c2a86);color:#fff;font-size:11px;font-weight:800;
+    letter-spacing:.14em;text-transform:uppercase;padding:8px 16px}
+  .cheat pre{background:#f8f9fe;color:#333a5c;font-family:'Cascadia Code',Consolas,monospace;
+    font-size:12px;line-height:1.8;padding:12px 16px;overflow-x:auto}
+
+  /* ---------- floating nav ---------- */
+  .navhome{
+    position:fixed;right:20px;bottom:20px;z-index:50;background:linear-gradient(90deg,#5b4df0,#c44df0);color:#fff;
+    text-decoration:none;font-weight:800;font-size:12.5px;letter-spacing:.1em;padding:11px 20px;border-radius:999px;
+    box-shadow:0 10px 30px rgba(90,60,240,.4);
+  }
+
+  /* ---------- print ---------- */
+  @page{size:A4;margin:10mm}
+  @media print{
+    body{background:#fff;font-size:13px}
+    .page{width:auto;min-height:auto;margin:0;border-radius:0;box-shadow:none;padding:12mm 10mm;page-break-after:always}
+    .page:last-of-type{page-break-after:auto}
+    .cover{min-height:250mm}
+    a{color:inherit;text-decoration:none}
+    .navhome{display:none}
+    pre.sql,pre.out{white-space:pre-wrap;word-break:break-word}
+
+    /* --- never slice a block in half at a sheet boundary:
+           if it doesn't fit, the WHOLE block moves to the next page --- */
+    .codewrap,.co,pre,svg.dgm,.venns,.vencard,.flow,.stat,
+    .toc-row,.cheat .cbox,.phead,.pfoot,.exh,.pill,summary,
+    .ex details.sol,.grid2 .co{
+      break-inside:avoid;page-break-inside:avoid;
+    }
+    .ref tr,.ref td{break-inside:avoid;page-break-inside:avoid}
+    .ref{break-inside:auto}                /* long tables may flow — but rows stay whole */
+    .ex{break-inside:auto}                 /* exercise lists may flow — each Q&A unit stays whole */
+    h1,h2,h3,.exh,.cot,.vt{break-after:avoid;page-break-after:avoid}  /* no orphan headings at sheet bottom */
+    p{orphans:3;widows:3}
+
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================ COVER -->
+<section class="page cover" id="cover">
+  <div class="ghost">SQL</div>
+  <span class="kwchip" style="top:9%;left:56%;transform:rotate(-6deg)">SELECT … FROM</span>
+  <span class="kwchip" style="top:22%;left:78%;transform:rotate(4deg)">GROUP BY</span>
+  <span class="kwchip" style="top:38%;left:70%;transform:rotate(-3deg)">JOIN … ON</span>
+  <span class="kwchip" style="top:14%;left:30%;transform:rotate(3deg)">WHERE</span>
+  <span class="kwchip" style="bottom:26%;left:66%;transform:rotate(5deg)">CREATE INDEX</span>
+  <span class="kwchip" style="bottom:14%;left:44%;transform:rotate(-4deg)">CASE WHEN</span>
+
+  <div class="cv-inner">
+    <span class="cv-chip">Complete Course · MySQL 8 · Hands-On</span>
+    <h1 class="cv-title">
+      <span class="grad">SQL</span><br>
+      <small>M A S T E R C L A S S</small>
+    </h1>
+    <p class="cv-sub">
+      From your very first <b>SELECT</b> to production-ready thinking — deep explanations of every
+      core topic, real examples rebuilt from seven hands-on lecture notebooks, and three
+      guided projects you can run on your own MySQL server today.
+    </p>
+    <div class="cv-stats">
+      <div class="stat"><b>16</b><span>Chapters</span></div>
+      <div class="stat"><b>3</b><span>Projects</span></div>
+      <div class="stat"><b>7</b><span>Lecture notebooks</span></div>
+      <div class="stat"><b>23</b><span>Pages</span></div>
+    </div>
+    <div class="cv-scroll">SCROLL ↓ &nbsp;·&nbsp; START WITH THE INDEX →</div>
+  </div>
+
+  <div class="cv-meta">
+    <span>📘 Built from the <b>MySql Notebooks</b> practice repository</span>
+    <span>Beginner → Advanced &nbsp;·&nbsp; September 2026 &nbsp;·&nbsp; v1.0</span>
+  </div>
+</section>
+
+<!-- ================================================================ INDEX -->
+<section class="page" id="index">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Navigation</span><span class="cn">Guide map</span></div>
+    <h1>Course <span class="gt">Index</span></h1>
+    <p class="lede">Five parts, sixteen chapters, three projects. Every chapter lives on its own page — click any row to jump straight there. Page numbers refer to guide pages (sections), not printed sheets.</p>
+  </header>
+
+  <div class="toc-part"><span class="pt">Part I — Foundations</span><span class="pl"></span></div>
+  <a class="toc-row" href="#ch1"><span class="no">01</span><span class="t">SQL &amp; Databases 101 — how MySQL thinks</span><span class="dots"></span><span class="pg">p. 04</span></a>
+  <a class="toc-row" href="#ch2"><span class="no">02</span><span class="t">Creating Databases &amp; Tables — types &amp; constraints</span><span class="dots"></span><span class="pg">p. 05</span></a>
+  <a class="toc-row" href="#ch3"><span class="no">03</span><span class="t">Modifying &amp; Destroying — ALTER, DELETE vs TRUNCATE vs DROP</span><span class="dots"></span><span class="pg">p. 06</span></a>
+
+  <div class="toc-part"><span class="pt">Part II — Working with Data</span><span class="pl"></span></div>
+  <a class="toc-row" href="#ch4"><span class="no">04</span><span class="t">Inserting Data — INSERT done right</span><span class="dots"></span><span class="pg">p. 07</span></a>
+  <a class="toc-row" href="#ch5"><span class="no">05</span><span class="t">Reading Data — SELECT &amp; the logical query order</span><span class="dots"></span><span class="pg">p. 08</span></a>
+  <a class="toc-row" href="#ch6"><span class="no">06</span><span class="t">Filtering — WHERE, IN, LIKE, NULL logic</span><span class="dots"></span><span class="pg">p. 09</span></a>
+  <a class="toc-row" href="#ch7"><span class="no">07</span><span class="t">Sorting &amp; Paging — ORDER BY, LIMIT, OFFSET</span><span class="dots"></span><span class="pg">p. 10</span></a>
+
+  <div class="toc-part"><span class="pt">Part III — Analyzing Data</span><span class="pl"></span></div>
+  <a class="toc-row" href="#ch8"><span class="no">08</span><span class="t">Aggregates — COUNT, SUM, MIN, MAX, AVG &amp; NULLs</span><span class="dots"></span><span class="pg">p. 11</span></a>
+  <a class="toc-row" href="#ch9"><span class="no">09</span><span class="t">Grouping — GROUP BY, HAVING &amp; duplicate hunters</span><span class="dots"></span><span class="pg">p. 12</span></a>
+  <a class="toc-row" href="#ch10"><span class="no">10</span><span class="t">Subqueries — queries inside queries</span><span class="dots"></span><span class="pg">p. 13</span></a>
+
+  <div class="toc-part"><span class="pt">Part IV — Relationships</span><span class="pl"></span></div>
+  <a class="toc-row" href="#ch11"><span class="no">11</span><span class="t">Relationships &amp; Foreign Keys — 1:1, 1:N, M:N</span><span class="dots"></span><span class="pg">p. 14</span></a>
+  <a class="toc-row" href="#ch12"><span class="no">12</span><span class="t">Joins — INNER, LEFT, RIGHT, CROSS &amp; anti-joins</span><span class="dots"></span><span class="pg">p. 15</span></a>
+
+  <div class="toc-part"><span class="pt">Part V — Power Tools</span><span class="pl"></span></div>
+  <a class="toc-row" href="#ch13"><span class="no">13</span><span class="t">Transactions — COMMIT, ROLLBACK &amp; ACID</span><span class="dots"></span><span class="pg">p. 16</span></a>
+  <a class="toc-row" href="#ch14"><span class="no">14</span><span class="t">Views — saved queries as virtual tables</span><span class="dots"></span><span class="pg">p. 17</span></a>
+  <a class="toc-row" href="#ch15"><span class="no">15</span><span class="t">CASE &amp; Conditionals — tiers, pivots, IFNULL</span><span class="dots"></span><span class="pg">p. 18</span></a>
+  <a class="toc-row" href="#ch16"><span class="no">16</span><span class="t">Indexes &amp; EXPLAIN — making queries fast</span><span class="dots"></span><span class="pg">p. 19</span></a>
+
+  <div class="toc-part"><span class="pt">Projects</span><span class="pl"></span></div>
+  <a class="toc-row" href="#proj1"><span class="no">P1</span><span class="t">E-Commerce Analytics — revenue, tiers &amp; top customers</span><span class="dots"></span><span class="pg">p. 20</span></a>
+  <a class="toc-row" href="#proj2"><span class="no">P2</span><span class="t">Student Enrollment System — many-to-many done properly</span><span class="dots"></span><span class="pg">p. 21</span></a>
+  <a class="toc-row" href="#proj3"><span class="no">P3</span><span class="t">Performance Tune-up — EXPLAIN before &amp; after</span><span class="dots"></span><span class="pg">p. 22</span></a>
+
+  <div class="toc-part"><span class="pt">Reference</span><span class="pl"></span></div>
+  <a class="toc-row" href="#cheat"><span class="no">★</span><span class="t">One-Page Cheatsheet &amp; What to Learn Next</span><span class="dots"></span><span class="pg">p. 23</span></a>
+
+  <h2>How this guide maps to your lectures</h2>
+  <table class="ref">
+    <tr><th>Lecture notebook</th><th>What it practiced</th><th>Deep-dived in chapters</th></tr>
+    <tr><td><code>Lecture 1</code></td><td>CREATE TABLE, INSERT, UPDATE, DELETE, TRUNCATE, DROP</td><td>Ch 2 · 3 · 4</td></tr>
+    <tr><td><code>Lecture 2</code></td><td>SELECT, WHERE, IN, LIKE, LIMIT / OFFSET, bulk seeding</td><td>Ch 4 · 5 · 6 · 7</td></tr>
+    <tr><td><code>Lecture 3</code></td><td>Combined filters, LIKE patterns, ORDER BY ASC / DESC</td><td>Ch 6 · 7</td></tr>
+    <tr><td><code>Lecture 4</code></td><td>COUNT / SUM / AVG, GROUP BY + HAVING, subqueries, transactions</td><td>Ch 3 · 8 · 9 · 10 · 13</td></tr>
+    <tr><td><code>Lecture 5</code></td><td>orders schema (ENUM, DECIMAL), joins, bulk data seeding</td><td>Ch 10 · 11 · 12</td></tr>
+    <tr><td><code>Lecture 6</code></td><td>Foreign keys, INDEX, EXPLAIN, CREATE VIEW, INFORMATION_SCHEMA</td><td>Ch 11 · 12 · 14 · 16</td></tr>
+    <tr><td><code>Lecture 7</code></td><td>3-table joins, views, many-to-many, CASE, IFNULL</td><td>Ch 12 · 14 · 15</td></tr>
+  </table>
+
+  <h2>How to read the pages</h2>
+  <div class="grid2">
+    <div class="co deep"><div class="cot">🧠 Masterclass insight</div><p>The “why” behind the syntax — how MySQL actually thinks.</p></div>
+    <div class="co tip"><div class="cot">💡 Pro tip</div><p>Habits and shortcuts used by experienced developers.</p></div>
+    <div class="co warn"><div class="cot">⚠️ Watch out</div><p>Traps that silently corrupt data or return wrong results.</p></div>
+    <div class="co story"><div class="cot">📓 From your notebook</div><p>A real moment from these lecture files that proves the point.</p></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Course Index</span><span class="fp">Page 02 · 23</span></footer>
+</section>
+
+<!-- ================================================================ SETUP -->
+<section class="page" id="setup">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Before You Start</span><span class="cn">Lab setup</span></div>
+    <h1>Lab Setup &amp; <span class="gt">The Dataset</span></h1>
+    <p class="lede">Everything in this guide runs on the exact database used in the lecture notebooks: the <code class="ic">maqbool</code> schema. Set up your lab once, and every example on the next 21 pages becomes runnable.</p>
+  </header>
+
+  <h2>1 · Set up MySQL in four steps</h2>
+  <ol>
+    <li><b>Install MySQL Server 8</b> — on Windows, the <i>MySQL Installer</i> (Developer Default) installs Server + Shell + Workbench together. Keep the default port <code class="ic">3306</code> and note your root password.</li>
+    <li><b>Verify the server</b> — open a terminal and run <code class="ic">mysql -u root -p</code>. If you reach the <code class="ic">mysql&gt;</code> prompt, you're in.</li>
+    <li><b>Install “MySQL Shell for VS Code”</b> (publisher: Oracle) from the Extensions panel — this is what runs the <code class="ic">.mysql-notebook</code> files in this repo. Connect it to <code class="ic">localhost:3306</code> as <code class="ic">root</code>.</li>
+    <li><b>Create the lab schema</b> — run the bootstrap block below, then run the lecture notebooks in order (1 → 7) or just follow this guide.</li>
+  </ol>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">bootstrap</span></div>
+<pre class="sql">CREATE DATABASE IF NOT EXISTS maqbool;
+USE maqbool;</pre></div>
+
+  <h2>2 · Meet the dataset you'll master</h2>
+  <p>The lectures slowly grew one small business: <b>people</b> (<code class="ic">maqbool_info</code>), the <b>orders</b> they placed, and <b>where</b> they live (<code class="ic">address</code>). Later, a second mini-world was added: <b>students</b> enrolling in <b>courses</b>. These six tables power every example ahead.</p>
+
+  <table class="ref">
+    <tr><th>Table</th><th>Rows</th><th>Purpose</th><th>Key columns</th></tr>
+    <tr><td><code>maqbool_info</code></td><td>~127</td><td>People / customers</td><td><code>id</code> PK · <code>name</code> · <code>age</code> · <code>gender</code> · <code>is_student</code> · <code>phone_number</code></td></tr>
+    <tr><td><code>orders</code></td><td>500</td><td>Purchase orders (generated in Lecture 5)</td><td><code>id</code> PK · <code>user_id</code> FK · <code>status</code> ENUM · <code>total_amount</code> DECIMAL · <code>created_at</code></td></tr>
+    <tr><td><code>address</code></td><td>~250</td><td>One address per person</td><td><code>id</code> PK · <code>user_id</code> FK · <code>address</code> · <code>pincode</code></td></tr>
+    <tr><td><code>students</code></td><td>3</td><td>Students (Lecture 7)</td><td><code>id</code> PK · <code>name</code> · <code>email</code></td></tr>
+    <tr><td><code>courses</code></td><td>3</td><td>Courses (Lecture 7)</td><td><code>id</code> PK · <code>course_name</code> · <code>instructor</code></td></tr>
+    <tr><td><code>student_courses</code></td><td>6</td><td>Enrollments — the M:N junction</td><td><code>student_id</code> FK · <code>course_id</code> FK · <code>enrollment_at</code></td></tr>
+  </table>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight</div>
+    <p>Notice the shape of the data, not just the data. One <b>person</b> can place many <b>orders</b>; one person has one <b>address</b>; a <b>student</b> and a <b>course</b> meet in the middle through <code class="ic">student_courses</code>. Recognizing these three shapes — 1-to-N, 1-to-1, and many-to-many — is 80% of real-world database design, and Chapters 11–12 turn them into queries.</p>
+  </div>
+
+  <h2>3 · Syntax conventions used everywhere</h2>
+  <ul class="tick">
+    <li><b>UPPERCASE</b> = SQL keywords (the language), <b>lowercase</b> = your table / column names. MySQL is case-insensitive for keywords; many servers are case-sensitive for table names on Linux — so stay lowercase.</li>
+    <li>Every statement ends with a <b>semicolon</b> <code class="ic">;</code>.</li>
+    <li>Text values use <b>single quotes</b> <code class="ic">'Arbaz'</code>; double quotes also work in MySQL but single quotes are portable.</li>
+    <li>Comments: <code class="ic">-- like this</code> or <code class="ic"># like this</code> to end of line.</li>
+  </ul>
+
+  <div class="co tip"><div class="cot">💡 Pro tip</div>
+    <p>Keep the lecture notebooks open next to this guide. Each chapter ends with exercises — <b>type them yourself</b> in a notebook cell and press <code class="ic">Ctrl+Enter</code>. SQL is a muscle, not a memory.</p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Lab Setup</span><span class="fp">Page 03 · 23</span></footer>
+</section>
+<!-- ================================================================ CH 1 -->
+<section class="page" id="ch1">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part I · Foundations</span><span class="cn">Chapter 01</span></div>
+    <h1>SQL &amp; Databases <span class="gt">101</span></h1>
+    <p class="lede">Before writing a single query, understand what you're talking to. This chapter builds the mental model — tables, the SQL language families, and the MySQL server/client split — using the very first commands from Lecture 1.</p>
+  </header>
+
+  <h2>What is a relational database, really?</h2>
+  <p>A <b>database</b> is a program whose entire job is to store data safely and answer questions about it fast. A <b>relational</b> database (RDBMS) stores that data in <b>tables</b> — grids of <b>rows</b> (one entity, e.g. one person) and <b>columns</b> (one attribute, e.g. their age). Think “super-powered spreadsheet” with three superpowers a spreadsheet lacks:</p>
+  <ul>
+    <li><b>Types &amp; constraints</b> — a column <i>declares</i> what it accepts (<code class="ic">INT</code>, dates, max lengths), so bad data can be rejected at the door.</li>
+    <li><b>Relationships</b> — tables can reference each other (“this order belongs to that person”), and the engine enforces those references.</li>
+    <li><b>Set-based querying</b> — you describe <i>which</i> rows you want in one statement; the engine figures out <i>how</i> to fetch millions of them. You never loop.</li>
+  </ul>
+  <p><b>SQL</b> (Structured Query Language) is how you talk to it. It's declarative: you state the result, not the procedure.</p>
+
+  <h2>The four families of SQL statements</h2>
+  <table class="ref">
+    <tr><th>Family</th><th>Full name</th><th>Verbs</th><th>Job</th><th>Deep dive</th></tr>
+    <tr><td><b>DDL</b></td><td>Data Definition</td><td><code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code></td><td>Build &amp; reshape structure (tables, views, indexes)</td><td>Ch 2, 3</td></tr>
+    <tr><td><b>DML</b></td><td>Data Manipulation</td><td><code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>SELECT</code></td><td>Put data in, change it, read it</td><td>Ch 4–12</td></tr>
+    <tr><td><b>TCL</b></td><td>Transaction Control</td><td><code>COMMIT</code>, <code>ROLLBACK</code></td><td>Group changes into all-or-nothing units</td><td>Ch 13</td></tr>
+    <tr><td><b>DCL</b></td><td>Data Control</td><td><code>GRANT</code>, <code>REVOKE</code></td><td>Who may do what (permissions)</td><td>beyond this guide</td></tr>
+  </table>
+
+  <h2>The server / client split</h2>
+  <p>When you ran the notebooks, two programs were involved. The <b>MySQL Server</b> is a background service that owns the data files and does all the real work. Everything else — the <b>MySQL Shell</b>, VS Code's notebook extension, Workbench, your future apps — is just a <b>client</b> that sends SQL text over a connection and draws the results. This is why the same queries work identically in every tool.</p>
+  <p style="text-align:center;margin:14px 0">
+    <span class="pill">🖥️ Your SQL (notebook cell)</span> → <span class="pill">🔌 client (MySQL Shell / VS Code)</span> → <span class="pill">🗄️ MySQL Server (:3306)</span> → <span class="pill">💾 data on disk</span>
+  </p>
+
+  <h2>Your first four commands</h2>
+  <p>Lecture 1 opened with the compass commands — how to see where you are and where you can go:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 1</span></div>
+<pre class="sql">SHOW DATABASES;
+USE maqbool;
+SHOW TABLES;
+SELECT * FROM maqbool_info;</pre></div>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">SHOW DATABASES on this machine</span></div>
+<pre class="out">Database
+-------------------
+arbaz
+collections
+information_schema
+maintainance
+maqbool
+mysql
+performance_schema
+products
+sys</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — those “extra” databases</div>
+    <p>Four of the nine entries aren't yours: <code class="ic">mysql</code> (server's own accounts/settings), <code class="ic">information_schema</code> (a live catalog of <i>everything</i> — tables, columns, indexes — queryable with normal SELECTs), <code class="ic">performance_schema</code> (runtime metrics) and <code class="ic">sys</code> (friendly views over it). Never write to them — but <i>reading</i> <code class="ic">information_schema</code> later will feel like a superpower (Ch 11 &amp; 17 use it).</p>
+  </div>
+
+  <table class="ref">
+    <tr><th>Command</th><th>What it does</th><th>Analogy</th></tr>
+    <tr><td><code>SHOW DATABASES;</code></td><td>Lists every schema this account can see</td><td>List the buildings</td></tr>
+    <tr><td><code>USE maqbool;</code></td><td>Sets your <b>current default schema</b> for this session</td><td>Walk into one building</td></tr>
+    <tr><td><code>SHOW TABLES;</code></td><td>Lists tables in the current schema</td><td>List the rooms</td></tr>
+    <tr><td><code>DESC maqbool_info;</code></td><td>Shows a table's column structure</td><td>Read a room's blueprint</td></tr>
+  </table>
+
+  <div class="co story"><div class="cot">📓 From your notebook</div>
+    <p>Lecture 1 once failed with <b>“MySQL Error (1046): No database selected”</b> — a <code class="ic">SELECT</code> ran after the notebook's <code class="ic">USE maqbool;</code> line was skipped. Every query needs a schema context: either <code class="ic">USE</code> one first, or fully qualify it: <code class="ic">SELECT * FROM maqbool.maqbool_info;</code></p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 1</div>
+    <div class="exq">1. Show all databases, then switch into <code class="ic">maqbool</code> and list its tables — using fully-qualified names instead of <code class="ic">USE</code>, list the columns of <code class="ic">orders</code>.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SHOW DATABASES;
+USE maqbool;
+SHOW TABLES;
+-- qualified form, no USE needed:
+DESC maqbool.orders;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">SHOW TABLES · DESC maqbool.orders</span></div>
+<pre class="out">Tables_in_maqbool
+-----------------
+address
+courses
+GetALLCustomersData
+maqbool_info
+maqbool_order
+orders
+student_courses
+students
+
+Field          Type                                        Null   Key   Default   Extra
+-------------  ------------------------------------------  -----  ----  --------  --------------
+id             int unsigned                                NO     PRI   NULL      auto_increment
+user_id        int unsigned                                NO     MUL   NULL
+order_number   varchar(20)                                 NO     UNI   NULL
+status         enum('pending','confirmed','processing',…)  NO           pending
+total_amount   decimal(10,2)                               NO           NULL
+item_count     tinyint unsigned                            NO           1
+payment_method enum('credit_card','debit_card','upi',…)    NO           NULL
+created_at     datetime                                    NO           CURRENT_TIMESTAMP
+updated_at     datetime                                    NO           CURRENT_TIMESTAMP</pre></div>
+    <div class="exq">2. Query the catalog: how many tables does the <code class="ic">maqbool</code> schema have?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT COUNT(*) AS table_count
+FROM information_schema.tables
+WHERE table_schema = 'maqbool';</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">tables in the maqbool schema</span></div>
+<pre class="out">table_count
+-----------
+8</pre></div>
+  </div>
+
+  <div class="co tip"><div class="cot">🧷 Remember</div>
+    <p>Server holds data · clients send SQL · <code class="ic">USE</code> sets context · <code class="ic">information_schema</code> is the map of the map. Next: build your own table.</p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 1 — SQL &amp; Databases 101</span><span class="fp">Page 04 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 2 -->
+<section class="page" id="ch2">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part I · Foundations</span><span class="cn">Chapter 02</span></div>
+    <h1>Creating Databases &amp; <span class="gt">Tables</span></h1>
+    <p class="lede">A table is a contract: “every row that enters will have these columns, of these types, obeying these rules.” This chapter teaches you to write that contract — data types, constraints, and the two production-grade schemas from Lectures 1 and 5.</p>
+  </header>
+
+  <h2>CREATE — from nothing to a working table</h2>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 1</span></div>
+<pre class="sql">CREATE TABLE maqbool_info (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(50) NOT NULL,
+    age         INT NOT NULL,
+    gender      VARCHAR(50) NOT NULL,
+    is_student  BOOLEAN DEFAULT TRUE
+);
+
+SHOW TABLES;      -- confirm it exists
+DESC maqbool_info; -- inspect the contract</pre></div>
+
+  <p>Five lines, five decisions: each column gets a <b>name</b>, a <b>type</b>, and zero or more <b>constraints</b>. Here is what MySQL recorded — the exact <code class="ic">DESC</code> output from the notebook:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">DESC maqbool_info</span></div>
+<pre class="out">Field        Type         Null   Key   Default   Extra
+-----------  -----------  -----  ----  --------  --------------
+id           int          NO     PRI   NULL      auto_increment
+name         varchar(50)  NO           NULL
+age          int          NO           NULL
+gender       varchar(50)  NO           NULL
+is_student   tinyint(1)   YES          1</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — reading DESC like a pro</div>
+    <p><b>Null</b> = may this column be empty? <b>Key</b> = <code class="ic">PRI</code> primary key, <code class="ic">UNI</code> unique, <code class="ic">MUL</code> indexed. <b>Default</b> = value used when you don't supply one. <b>Extra</b> = engine-side behavior like <code class="ic">auto_increment</code>. Also notice: <code class="ic">BOOLEAN</code> was stored as <code class="ic">tinyint(1)</code> — in MySQL, BOOL is an <i>alias</i>; <code class="ic">TRUE</code>/<code class="ic">FALSE</code> are just 1 and 0 wearing a costume.</p>
+  </div>
+
+  <h2>Choosing data types — the complete cheat table</h2>
+  <table class="ref">
+    <tr><th>Type</th><th>Stores</th><th>Example</th><th>Use it when</th></tr>
+    <tr><td><code>TINYINT</code></td><td>−128…127 (or 0…255 unsigned)</td><td><code>TINYINT UNSIGNED</code></td><td>Small counters — an item count will never need INT</td></tr>
+    <tr><td><code>INT</code></td><td>±2.1 billion</td><td><code>INT</code></td><td>IDs, ages, counts — the default integer</td></tr>
+    <tr><td><code>BIGINT</code></td><td>±9.2 quintillion</td><td><code>BIGINT</code></td><td>Pincodes with leading digits, huge IDs, timestamps in µs</td></tr>
+    <tr><td><code>… UNSIGNED</code></td><td>same range, shifted to 0…2×max</td><td><code>INT UNSIGNED</code></td><td>Values that can't be negative — the <code>orders</code> table uses it</td></tr>
+    <tr><td><code>DECIMAL(p,s)</code></td><td><b>exact</b> fixed-point</td><td><code>DECIMAL(10,2)</code></td><td><b>Money. Always.</b> — 10 digits total, 2 after the point</td></tr>
+    <tr><td><code>FLOAT / DOUBLE</code></td><td>approximate floats</td><td><code>DOUBLE</code></td><td>Scientific values — <b>never</b> for currency (rounding drift)</td></tr>
+    <tr><td><code>VARCHAR(n)</code></td><td>text up to n chars</td><td><code>VARCHAR(50)</code></td><td>Names, emails, titles — size honestly, not 255 by reflex</td></tr>
+    <tr><td><code>TEXT</code></td><td>long text (~64 KB)</td><td><code>TEXT</code></td><td>Bodies, descriptions — can't have a DEFAULT</td></tr>
+    <tr><td><code>ENUM('a','b')</code></td><td>one value from a fixed list (stored as a number!)</td><td><code>ENUM('pending','shipped')</code></td><td>Statuses with a closed set — compact &amp; self-documenting</td></tr>
+    <tr><td><code>BOOLEAN</code></td><td>alias for <code>TINYINT(1)</code></td><td><code>BOOLEAN DEFAULT TRUE</code></td><td>Flags</td></tr>
+    <tr><td><code>DATE / TIME</code></td><td>date only / time only</td><td><code>DATE</code></td><td>Birthdays, shifts</td></tr>
+    <tr><td><code>DATETIME</code></td><td>wall-clock date+time, any era</td><td><code>DATETIME</code></td><td>Event times you keep as given</td></tr>
+    <tr><td><code>TIMESTAMP</code></td><td>UTC-stored, timezone-converted on read, 1970–2038</td><td><code>TIMESTAMP</code></td><td>Auto <code>created_at</code> / <code>updated_at</code> — see below</td></tr>
+  </table>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out</div>
+    <p><b>Money is DECIMAL, full stop.</b> <code class="ic">FLOAT</code>/<code class="ic">DOUBLE</code> are binary approximations: <code class="ic">0.1 + 0.2 ≠ 0.3</code>. An e-commerce total that drifts by a paisa per order becomes an accounting nightmare. Also: <code class="ic">TIMESTAMP</code> ends in 2038 — fine for <code class="ic">created_at</code>, wrong for birthdates or “contract expires 2040”.</p>
+  </div>
+
+  <h2>A production-grade schema, annotated</h2>
+  <p>Lecture 5 built this <code class="ic">orders</code> table — every type decision above, in one place:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 5</span></div>
+<pre class="sql">CREATE TABLE orders (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id         INT UNSIGNED NOT NULL,               -- who ordered (FK added in Ch 11)
+    order_number    VARCHAR(20)  NOT NULL UNIQUE,        -- business ID, no duplicates
+    status          ENUM('pending','confirmed','processing',
+                         'shipped','delivered','cancelled','refunded')
+                         NOT NULL DEFAULT 'pending',     -- closed set + safe default
+    total_amount    DECIMAL(10,2) NOT NULL,              -- exact money: up to 99,999,999.99
+    item_count      TINYINT UNSIGNED NOT NULL DEFAULT 1, -- small non-negative counter
+    payment_method  ENUM('credit_card','debit_card','upi',
+                         'net_banking','cod','wallet') NOT NULL,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                              ON UPDATE CURRENT_TIMESTAMP  -- auto "last modified"
+);</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — constraints are the database defending itself</div>
+    <p>Every constraint is a promise the engine enforces <i>forever</i>, no matter which buggy app, script, or tired human talks to it. <code class="ic">NOT NULL</code> blocks “forgetting”, <code class="ic">DEFAULT</code> supplies the sane value, <code class="ic">UNIQUE</code> blocks duplicates, <code class="ic">ENUM</code> blocks typo-states like <code class="ic">'Delivered '</code>. Applications come and go — the contract stays. Design constraints first, not “later”.</p>
+  </div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — the audit-columns pattern</div>
+    <p>Almost every serious table carries <code class="ic">created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP</code> and <code class="ic">updated_at … ON UPDATE CURRENT_TIMESTAMP</code>. The database fills both automatically — zero application code — and you get free forensics (“when did this row change?”). Lecture 4 added exactly these to <code class="ic">maqbool_info</code>.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 2</div>
+    <div class="exq">1. Design a <code class="ic">books</code> table: auto-increment id, title (required), author, price (exact money), genre from a fixed list, in_stock flag defaulting true, created/updated timestamps.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">CREATE TABLE books (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(150) NOT NULL,
+    author      VARCHAR(100),
+    price       DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+    genre       ENUM('fiction','tech','history','kids') NOT NULL DEFAULT 'fiction',
+    in_stock    BOOLEAN DEFAULT TRUE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">mysql shell</span></div>
+<pre class="out">Query OK, 0 rows affected (0.03 sec)</pre></div>
+    <div class="exq">2. Run <code class="ic">DESC books;</code> and verify: which column shows <code class="ic">UNI</code> if you add <code class="ic">isbn VARCHAR(13) UNIQUE</code>?</div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 2 — Creating Databases &amp; Tables</span><span class="fp">Page 05 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 3 -->
+<section class="page" id="ch3">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part I · Foundations</span><span class="cn">Chapter 03</span></div>
+    <h1>Modifying &amp; <span class="gt">Destroying</span></h1>
+    <p class="lede">Schemas evolve and data gets removed. This chapter covers <code class="ic">ALTER TABLE</code>, then draws the line every developer must never blur: <code class="ic">DELETE</code> vs <code class="ic">TRUNCATE</code> vs <code class="ic">DROP</code> — using two painful (and instructive) moments from Lecture 1.</p>
+  </header>
+
+  <h2>ALTER TABLE — reshaping a live table</h2>
+  <p>You never have to get a schema right the first time. Lecture 1 grew <code class="ic">maqbool_info</code> twice:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lectures 1 &amp; 4</span></div>
+<pre class="sql">-- add a brand-new column (existing rows get NULL / the default)
+ALTER TABLE maqbool_info ADD phone_number VARCHAR(20);
+
+-- change a column's definition: age may now be empty, defaults to NULL
+ALTER TABLE maqbool_info MODIFY COLUMN age INT DEFAULT NULL;
+
+-- add the audit timestamps (Ch 2 pattern)
+ALTER TABLE maqbool_info ADD COLUMN createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- rename a column (MySQL 8):
+ALTER TABLE maqbool_info RENAME COLUMN createdAt TO created_at;
+
+-- remove a column entirely (data gone with it):
+ALTER TABLE maqbool_info DROP COLUMN phone_number;</pre></div>
+
+  <table class="ref">
+    <tr><th>Clause</th><th>Does</th><th>Fails if…</th></tr>
+    <tr><td><code>ADD [COLUMN] c type</code></td><td>creates a new column</td><td>column already exists (Error 1060)</td></tr>
+    <tr><td><code>MODIFY [COLUMN] c type</code></td><td><b>redefines an existing</b> column (type/default/null)</td><td>column doesn't exist (Error 1054)</td></tr>
+    <tr><td><code>CHANGE [COLUMN] old new type</code></td><td>redefine <b>and</b> rename in one shot</td><td>old name missing</td></tr>
+    <tr><td><code>RENAME COLUMN old TO new</code></td><td>rename only, keeps type</td><td>old name missing</td></tr>
+    <tr><td><code>DROP [COLUMN] c</code></td><td>delete column + its data, permanently</td><td>column doesn't exist</td></tr>
+  </table>
+
+  <div class="co story"><div class="cot">📓 From your notebook</div>
+    <p>Lecture 4 ran <code class="ic">ALTER TABLE maqbool_info MODIFY COLUMN updatedAT TIMESTAMP …</code> before <code class="ic">updatedAT</code> existed — MySQL answers with <b>Error 1054: Unknown column</b>. The lesson stuck: <b>MODIFY edits what is; ADD creates what isn't.</b> If a column is missing, you need <code class="ic">ADD</code>.</p>
+  </div>
+
+  <h2>The three destroyers</h2>
+  <p>Three statements remove things, at three different scales. Confusing them is how production incidents happen:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 1</span></div>
+<pre class="sql">DELETE  FROM maqbool_info WHERE id = 3;  -- remove chosen rows, keep table
+TRUNCATE TABLE maqbool_info;             -- empty ALL rows, keep table shell
+DROP TABLE maqbool_info;                 -- delete the table itself
+SHOW TABLES;                             -- ...and it's gone</pre></div>
+
+  <table class="ref">
+    <tr><th></th><th>DELETE</th><th>TRUNCATE</th><th>DROP</th></tr>
+    <tr><td><b>Removes</b></td><td>selected rows</td><td><b>all</b> rows</td><td>entire table + data + definition</td></tr>
+    <tr><td><b>WHERE allowed?</b></td><td>✅ yes — its whole power</td><td>❌ no</td><td>❌ no</td></tr>
+    <tr><td><b>Speed</b></td><td>row-by-row (logs each)</td><td>near-instant (deallocates pages)</td><td>instant</td></tr>
+    <tr><td><b>AUTO_INCREMENT reset?</b></td><td>no — counter keeps climbing</td><td>✅ yes — back to 1</td><td>✅ gone entirely</td></tr>
+    <tr><td><b>Fires row triggers?</b></td><td>✅ yes</td><td>❌ no</td><td>❌ no</td></tr>
+    <tr><td><b>Transactional?</b></td><td>✅ can ROLLBACK (Ch 13)</td><td>⚠️ implicit commit in MySQL</td><td>⚠️ implicit commit</td></tr>
+    <tr><td><b>Use when</b></td><td>“remove <i>these</i> rows”</td><td>“reset the table for testing”</td><td>“this table shouldn't exist”</td></tr>
+  </table>
+
+  <div class="co story"><div class="cot">📓 From your notebook — the DELETE that ate too much</div>
+    <p>Lecture 1 ran <code class="ic">DELETE FROM maqbool_info WHERE name='Maqbool';</code> and <b>every</b> Maqbool row vanished at once — the table held several rows with the same name, because names are not unique. That's the moment you learn: <b>filter by the primary key</b> (<code class="ic">WHERE id = 3</code>) when deleting one thing, and make business identifiers <code class="ic">UNIQUE</code> (Ch 2) when duplicates are meaningless.</p>
+  </div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — the safe-DELETE ritual</div>
+    <p>Before any destructive statement, run the identical <code class="ic">WHERE</code> as a <code class="ic">SELECT</code> first:</p>
+<pre class="sql">-- step 1: preview exactly what will die
+SELECT * FROM maqbool_info WHERE id = 3;
+-- step 2: only then pull the trigger
+DELETE FROM maqbool_info WHERE id = 3;</pre>
+    <p>And remember the next chapter's tool: wrap risky changes in a transaction so <code class="ic">ROLLBACK</code> can save you (Ch 13).</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 3</div>
+    <div class="exq">1. <code class="ic">books</code> needs a <code class="ic">rating DECIMAL(2,1)</code> column that defaults to <code class="ic">0.0</code>, and the <code class="ic">genre</code> column must go. Write both statements.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">ALTER TABLE books ADD rating DECIMAL(2,1) NOT NULL DEFAULT 0.0;
+ALTER TABLE books DROP COLUMN genre;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">mysql shell · both statements</span></div>
+<pre class="out">Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0</pre></div>
+    <div class="exq">2. You want to reuse a test table with fresh IDs, keeping its structure. Which statement? What if you only need rows where <code class="ic">in_stock = FALSE</code> gone?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">TRUNCATE TABLE books;                        -- full reset, AI counter back to 1
+DELETE FROM books WHERE in_stock = FALSE;    -- targeted cleanup, AI unchanged</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">mysql shell · 4 books, 1 out of stock</span></div>
+<pre class="out">Query OK, 0 rows affected (0.02 sec)
+
+Query OK, 1 row affected (0.01 sec)</pre></div>
+  </div>
+
+  <div class="co tip"><div class="cot">🧷 Remember</div>
+    <p><b>ADD</b> creates, <b>MODIFY</b> redefines · <b>DELETE</b> = rows + WHERE, <b>TRUNCATE</b> = all rows fast, <b>DROP</b> = the table itself · always <code class="ic">SELECT</code> your <code class="ic">WHERE</code> before you destroy with it.</p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 3 — Modifying &amp; Destroying</span><span class="fp">Page 06 · 23</span></footer>
+</section>
+<!-- ================================================================ CH 4 -->
+<section class="page" id="ch4">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part II · Working with Data</span><span class="cn">Chapter 04</span></div>
+    <h1>Inserting Data — <span class="gt">INSERT</span> Done Right</h1>
+    <p class="lede">Rows enter a table only through <code class="ic">INSERT</code>. Simple — until a phone number loses its <code class="ic">+</code>, or a value lands in the wrong column. This chapter covers every insertion pattern from Lectures 1, 2 and 7, plus the quoting rule that would have saved all of it.</p>
+  </header>
+
+  <h2>The anatomy of an INSERT</h2>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 1</span></div>
+<pre class="sql">INSERT INTO maqbool_info (name, age, gender, is_student, phone_number)
+VALUES ('Arbaz', 23, 'male', FALSE, '+91345376898932');
+
+-- several rows in one statement — one round-trip, one statement to read:
+INSERT INTO maqbool_info (name, age, gender, is_student, phone_number)
+VALUES ('Arbaz',   23, 'male', FALSE, '+91345376898932'),
+       ('Maqbool', 20, 'male', FALSE, '+9142354543');</pre></div>
+
+  <ul>
+    <li><b>The column list is the map.</b> It pairs each value with its destination column, so order mistakes are impossible and new columns (like <code class="ic">created_at</code>) don't silently shift your values. Omit it and you must supply <i>every</i> column in <i>exact</i> table order — fragile. Always write the list.</li>
+    <li><b>Skipped columns get their DEFAULT</b> — <code class="ic">id</code> auto-increments, <code class="ic">is_student</code> would have become 1 if omitted.</li>
+    <li><b>Multi-row VALUES</b> scale to hundreds of rows (Lecture 2 seeded ~127 people in exactly one such statement).</li>
+  </ul>
+
+  <div class="co story"><div class="cot">📓 From your notebook — the vanishing “+”</div>
+    <p>Lecture 1 inserted the phone as <code class="ic">+91345376898932</code> — <b>unquoted</b>. MySQL read it as arithmetic on a number and stored <code class="ic">91345376898932</code>: the <code class="ic">+</code> vanished. A phone written as <code class="ic">09876543210</code> would have lost its leading <code class="ic">0</code> the same way. <b>Rule: if it isn't math, it isn't a number.</b> Phone numbers, pin codes with leading zeros, ID card numbers — always strings.</p>
+  </div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — what NULL and DEFAULT really do</div>
+    <p>Inside <code class="ic">VALUES</code>, the keywords <code class="ic">NULL</code> and <code class="ic">DEFAULT</code> are first-class values: <code class="ic">VALUES ('Zara', 22, 'female', DEFAULT, NULL)</code> explicitly says “use the column's default” and “store emptiness”. Lecture 7's seed rows did exactly this — inserting explicit IDs with <code class="ic">NOW()</code> timestamps:</p>
+<pre class="sql">INSERT INTO maqbool_info (id, name, age, gender, is_student, phone_number, created_at, updated_at)
+VALUES (128, 'Arbaz Khan', 25, 'male', 1, '9876543210', NOW(), NOW()),
+       (130, 'Zara Patel', 22, 'female', 1, NULL, NOW(), NOW());   -- phone = no phone</pre>
+  </div>
+
+  <h2>Inserting into the orders table</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">pattern · orders</span></div>
+<pre class="sql">INSERT INTO orders (user_id, order_number, status, total_amount, item_count, payment_method)
+VALUES (1, 'ORD-20260901-0001', 'confirmed', 2499.00, 3, 'upi'),
+       (2, 'ORD-20260901-0002', 'delivered', 8999.50, 1, 'credit_card');
+-- status omitted → DEFAULT 'pending' kicks in
+-- created_at / updated_at stamp themselves (Ch 2)</pre></div>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out</div>
+    <p>Three classic insert errors: <b>column count mismatch</b> (Error 1136 — values ≠ listed columns), <b>duplicate key</b> (Error 1062 — a <code class="ic">UNIQUE</code>/<code class="ic">PRIMARY</code> value already taken), and <b>out-of-range / wrong ENUM value</b> (Error 1265) — strict mode rejects instead of silently mangling. Read the error; it names the culprit.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 4</div>
+    <div class="exq">1. Insert two books in one statement; give one of them no rating and let the defaults handle the rest.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">INSERT INTO books (title, author, price, in_stock)
+VALUES ('SQL Deep Dives', 'A. Khan', 499.00, TRUE),
+       ('Query Craft',    'M. Sheikh', 799.00, DEFAULT);</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">mysql shell · defaults applied</span></div>
+<pre class="out">Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+SELECT id, title, price, genre, in_stock FROM books;
+id  title           price   genre     in_stock
+--  --------------  ------  --------  --------
+1   SQL Deep Dives  499.00  fiction            1
+2   Query Craft     799.00  fiction            1</pre></div>
+    <div class="exq">2. Why is <code class="ic">INSERT INTO t VALUES ('Riya', '19A', 'f')</code> against <code class="ic">books(title, rating, in_stock)</code> asking for trouble? Rewrite it safely.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">-- no column list: fragile, order-dependent, breaks when columns change
+INSERT INTO books (title, rating, in_stock) VALUES ('Riya', '19A', 'f');
+-- (and '19A' into DECIMAL + 'f' into BOOLEAN only survive by luck/coercion — name your columns, use 19.5 and TRUE)</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">strict mode rejects the garbage value</span></div>
+<pre class="out">ERROR 1366 (HY000): Incorrect decimal value: '19A' for column 'rating' at row 1</pre></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 4 — Inserting Data</span><span class="fp">Page 07 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 5 -->
+<section class="page" id="ch5">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part II · Working with Data</span><span class="cn">Chapter 05</span></div>
+    <h1>Reading Data — <span class="gt">SELECT</span> &amp; the Logical Order</h1>
+    <p class="lede">You'll write more SELECTs than everything else combined. Beyond the basics from Lecture 2, this chapter hands you the single most useful model in all of SQL: the <b>logical processing order</b> — the lens that later explains GROUP BY, HAVING, aliases and LIMIT in one shot.</p>
+  </header>
+
+  <h2>Projection: choosing columns</h2>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 2</span></div>
+<pre class="sql">SELECT * FROM maqbool_info;              -- every column (fine for exploring)
+SELECT id, name, age FROM maqbool_info;  -- only what you need
+SELECT gender, phone_number FROM maqbool_info;
+
+-- aliases rename output columns; expressions compute on the fly:
+SELECT name AS user_name, age AS user_age, age + 5 AS age_in_5_years
+FROM maqbool_info;
+
+SELECT DISTINCT gender FROM maqbool_info;          -- unique values only
+SELECT DISTINCT age, gender FROM maqbool_info;     -- unique combinations</pre></div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip</div>
+    <p><code class="ic">SELECT *</code> is for humans exploring, not for applications. Selecting 30 columns to use 3 wastes network, memory, and — once indexes exist (Ch 16) — can even disable the fastest read path. Name your columns; the query also becomes self-documenting.</p>
+  </div>
+
+  <h2>The master key: logical processing order</h2>
+  <p>SQL is written top-to-bottom but executed in a different order. Burn this sequence in — every “why can't I do X?” question for the rest of this guide is answered by it:</p>
+
+  <div class="flow">
+    <div class="fstep"><span class="n">1</span><span class="code">FROM / JOIN</span><span class="why">gather the source rows</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">2</span><span class="code">WHERE</span><span class="why">filter individual rows</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">3</span><span class="code">GROUP BY</span><span class="why">collapse rows into groups</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">4</span><span class="code">HAVING</span><span class="why">filter whole groups</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">5</span><span class="code">SELECT</span><span class="why">compute output columns &amp; aliases</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">6</span><span class="code">ORDER BY</span><span class="why">sort the final rows</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">7</span><span class="code">LIMIT / OFFSET</span><span class="why">keep a window of them</span></div>
+  </div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — why the order explains everything</div>
+    <p>You can't use a <code class="ic">SELECT</code> alias inside <code class="ic">WHERE</code> — step 2 runs before step 5, so the alias doesn't exist yet. You <i>can</i> use it in <code class="ic">ORDER BY</code> — step 6 runs after. <code class="ic">WHERE</code> sees raw rows (before grouping); <code class="ic">HAVING</code> sees groups (after). This one diagram is why Ch 9's “HAVING vs WHERE” and Ch 7's “ORDER BY the alias” both work. When a query confuses you, number its clauses 1–7 and re-read it in execution order.</p>
+  </div>
+
+  <h2>Aliasing — for columns and for tables</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">pattern · everywhere ahead</span></div>
+<pre class="sql">SELECT m.name AS person,
+       m.age  AS years_old
+FROM maqbool_info AS m;      -- table alias: from Ch 12 onward you'll write m, o, ad constantly</pre></div>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out</div>
+    <p>Aliases are strings to the outside world: <code class="ic">SELECT age + 5 AS "age in 5y"</code> needs quotes because of spaces. And in <code class="ic">ORDER BY</code>, a bare number (<code class="ic">ORDER BY 2</code>) sorts by the 2nd output column — legal, but don't: one added column silently reorders your results.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 5</div>
+    <div class="exq">1. From <code class="ic">orders</code>: show <code class="ic">order_number</code>, <code class="ic">total_amount</code>, and a computed <code class="ic">amount_with_gst</code> (18% on top), aliasing all three sensibly. No duplicates of payment methods — list each once.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT order_number,
+       total_amount,
+       ROUND(total_amount * 1.18, 2) AS amount_with_gst
+FROM orders;
+
+SELECT DISTINCT payment_method FROM orders;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">first query · 5 of 500 rows · then the DISTINCT list</span></div>
+<pre class="out">order_number         total_amount   amount_with_gst
+--------------------  -------------  ---------------
+ORD-20260812-0041         2499.00         2948.82
+ORD-20260728-0187        17320.50        20438.19
+ORD-20260902-0114          645.75          761.99
+ORD-20260830-0226        24997.60        29497.17
+ORD-20260705-0093        12000.00        14160.00
+… 495 more rows
+
+payment_method
+----------------
+upi
+credit_card
+debit_card
+net_banking
+cod
+wallet</pre></div>
+    <div class="exq">2. Using the logical order, explain why <code class="ic">SELECT name AS n FROM maqbool_info WHERE n LIKE 'A%';</code> fails but <code class="ic">… ORDER BY n;</code> works.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">-- WHERE is step 2, SELECT (which creates alias n) is step 5 → n doesn't exist yet in WHERE.
+-- ORDER BY is step 6 → alias exists. Fix: WHERE name LIKE 'A%';</pre></details>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 5 — Reading Data: SELECT</span><span class="fp">Page 08 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 6 -->
+<section class="page" id="ch6">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part II · Working with Data</span><span class="cn">Chapter 06</span></div>
+    <h1>Filtering — <span class="gt">WHERE</span>, IN, LIKE &amp; NULL Logic</h1>
+    <p class="lede">WHERE is where analysis begins: from “all rows” to “exactly the rows that matter”. Lectures 2 and 3 hammered these operators against 127 people — this chapter systematizes them and confronts the strangest citizen of SQL: <code class="ic">NULL</code>.</p>
+  </header>
+
+  <h2>Comparison operators</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 2</span></div>
+<pre class="sql">SELECT * FROM maqbool_info WHERE id = 1;
+SELECT * FROM maqbool_info WHERE age &gt;= 21;
+SELECT * FROM maqbool_info WHERE gender &lt;&gt; 'male';   -- &lt;&gt; or != — same thing
+SELECT * FROM maqbool_info WHERE age BETWEEN 18 AND 25;  -- inclusive both ends</pre></div>
+
+  <h2>Combining conditions — AND, OR, NOT</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 3</span></div>
+<pre class="sql">SELECT * FROM maqbool_info WHERE name LIKE 'Arbaz%' AND gender = 'male';
+SELECT * FROM maqbool_info WHERE name LIKE 'Arbaz%' AND is_student = TRUE;
+SELECT * FROM maqbool_info WHERE name NOT LIKE 'Arbaz%' AND age = 22
+ORDER BY id ASC;</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — AND binds tighter than OR</div>
+    <p><code class="ic">WHERE name = 'Arbaz' OR gender = 'female' AND age = 22</code> does <b>not</b> mean “(name or gender) and age”. AND wins: it parses as <code class="ic">name='Arbaz' OR (gender='female' AND age=22)</code> — every male Arbaz of any age sneaks in. Parenthesize whenever AND and OR mix. Reading your own query six months later counts too.</p>
+  </div>
+
+  <h2>IN — the readable OR</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 2</span></div>
+<pre class="sql">SELECT * FROM maqbool_info WHERE name IN ('Arbaz', 'Arbaz Khan', 'Esha Solanki');
+SELECT * FROM maqbool_info WHERE id IN (1, 23, 3, 4, 53);
+
+SELECT * FROM maqbool_info
+WHERE age NOT IN (21, 31, 44)
+  AND gender = 'female';</pre></div>
+  <p><code class="ic">IN</code> is equivalent to a chain of <code class="ic">=</code> joined by <code class="ic">OR</code> — shorter, clearer, and (unlike that chain) it can also take a subquery, which is exactly where Chapter 10 takes it.</p>
+
+  <h2>LIKE — pattern matching</h2>
+  <table class="ref">
+    <tr><th>Pattern</th><th>Matches</th><th>Example hits</th></tr>
+    <tr><td><code>'Arbaz%'</code></td><td>starts with Arbaz</td><td>Arbaz, Arbaz Khan, Arbaz Ayub Khan</td></tr>
+    <tr><td><code>'%Khan'</code></td><td>ends with Khan</td><td>Arbaz Khan, Zara Khan</td></tr>
+    <tr><td><code>'%Arbaz%'</code></td><td>contains Arbaz</td><td>Arbaz, Md Arbaz, ArbazKhan</td></tr>
+    <tr><td><code>'_rbaz'</code></td><td><code>_</code> = exactly one char</td><td>Arbaz, orbaz</td></tr>
+    <tr><td><code>'Arbaz __'</code></td><td>exactly two trailing chars</td><td>Arbaz khan-length names of that shape</td></tr>
+    <tr><td><code>NOT LIKE '%a%'</code></td><td>negation of any pattern</td><td>names without an “a”</td></tr>
+  </table>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 2</span></div>
+<pre class="sql">SELECT * FROM maqbool_info WHERE name LIKE '%Arbaz%';
+SELECT * FROM maqbool_info WHERE name LIKE '%P%';          -- any name containing P/p
+SELECT * FROM maqbool_info WHERE name NOT LIKE '%Arbaz%';</pre></div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip</div>
+    <p>Default MySQL collations compare text <b>case-insensitively</b>, so <code class="ic">LIKE 'arbaz%'</code> finds “Arbaz” too (that's why <code class="ic">'%P%'</code> matched lowercase p's in the lecture). Need case-sensitive matching? Use <code class="ic">LIKE BINARY 'Arbaz%'</code> — and remember <code class="ic">'%term%'</code> patterns can't use ordinary indexes (Ch 16), while <code class="ic">'Arbaz%'</code> can.</p>
+  </div>
+
+  <h2>NULL — the value that isn't a value</h2>
+  <p>After Lecture 4 made <code class="ic">age</code> nullable and set some rows to NULL, one rule became unavoidable:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 4</span></div>
+<pre class="sql">UPDATE maqbool_info SET age = NULL WHERE age = 0;   -- unknown age, honestly stored
+
+SELECT COUNT(*) FROM maqbool_info;                  -- counts everyone
+SELECT COUNT(age) FROM maqbool_info;                -- counts only known ages!
+SELECT * FROM maqbool_info WHERE age IS NULL;       -- find the unknowns
+SELECT * FROM maqbool_info WHERE age IS NOT NULL;</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — three-valued logic</div>
+    <p>NULL means <i>“unknown”</i>, not zero and not empty string. Any comparison with an unknown yields <i>unknown</i> — so <code class="ic">WHERE age = NULL</code> matches <b>nothing, ever</b>, and <code class="ic">WHERE age &lt;&gt; 21</code> also silently skips NULL-age rows (unknown isn't ≠ 21; it's unknown). The language has three truth values — TRUE, FALSE, UNKNOWN — and only TRUE survives a WHERE. Hence: <code class="ic">IS NULL</code> / <code class="ic">IS NOT NULL</code> are not style choices; they're the only correct tools. Ch 8 shows aggregates joining the conspiracy by ignoring NULLs too.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 6</div>
+    <div class="exq">1. Female customers aged 20–30 whose name does <b>not</b> contain “khan” (any case). One query.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT id, name, age, gender
+FROM maqbool_info
+WHERE gender = 'female'
+  AND age BETWEEN 20 AND 30
+  AND name NOT LIKE '%khan%';</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">5 of 44 rows</span></div>
+<pre class="out">id    name           age   gender
+----  -------------  ----  ------
+9     Priya Nair      22   female
+42    Ananya Iyer     24   female
+55    Meera Nair      22   female
+71    Isha Verma      21   female
+88    Tara Bose       27   female
+… 39 more rows</pre></div>
+    <div class="exq">2. People with no phone number on file — and people whose phone is stored but empty string. Why are these different queries?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT * FROM maqbool_info WHERE phone_number IS NULL;   -- never filled
+SELECT * FROM maqbool_info WHERE phone_number = '';      -- filled with emptiness
+-- NULL = unknown; '' = a known, zero-length value. Different facts, different queries.</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">first query · 3 of 31 rows · then the = '' check</span></div>
+<pre class="out">id    name          gender   phone_number
+----  ------------  -------  ------------
+12    Neha Kapoor   female   NULL
+47    Ritika Shah   female   NULL
+103   Sana Qureshi  female   NULL
+… 28 more rows
+
+Empty set (0.00 sec)   ← the = '' query: nobody's phone is the empty string</pre></div>
+    <div class="exq">3. Rewrite without IN: <code class="ic">WHERE id IN (1,23,3,4,53)</code>.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">WHERE id = 1 OR id = 23 OR id = 3 OR id = 4 OR id = 53;   -- same result, worse readability</pre></details>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 6 — Filtering: WHERE</span><span class="fp">Page 09 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 7 -->
+<section class="page" id="ch7">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part II · Working with Data</span><span class="cn">Chapter 07</span></div>
+    <h1>Sorting &amp; Paging — <span class="gt">ORDER BY, LIMIT, OFFSET</span></h1>
+    <p class="lede">Tables have no natural order — a “sorted table” only exists at query time. Lecture 3 practiced <code class="ic">ORDER BY</code>, Lecture 2 paged through 127 people with <code class="ic">LIMIT … OFFSET …</code>. Here's the full mental model, plus the trap that makes unordered LIMIT a lottery.</p>
+  </header>
+
+  <h2>ORDER BY — imposing order at read time</h2>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 3</span></div>
+<pre class="sql">SELECT * FROM maqbool_info WHERE name LIKE 'Arbaz%' AND age = 22
+ORDER BY id DESC LIMIT 10 OFFSET 0;          -- newest first
+
+SELECT * FROM maqbool_info WHERE name NOT LIKE 'Arbaz%' AND age = 22
+ORDER BY name ASC;                            -- alphabetical
+
+-- multiple keys: sort by name, break ties by id (descending):
+SELECT name, age FROM maqbool_info ORDER BY name ASC, id DESC;</pre></div>
+
+  <ul>
+    <li><code class="ic">ASC</code> is the default (A→Z, 0→9, old→new); <code class="ic">DESC</code> flips it.</li>
+    <li>Multiple keys = tie-breakers: rows equal on the first key are ordered by the second.</li>
+    <li>You may sort by output aliases (<code class="ic">ORDER BY user_name</code>) or even by column position (<code class="ic">ORDER BY 2</code>) — prefer names; positions break silently.</li>
+  </ul>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — where does the sort <i>happen</i>?</div>
+    <p>By the logical order, ORDER BY is step 6: it sorts the <i>finished result set</i>, after filtering and column selection. That's why you can sort by expressions and aliases that exist nowhere in the table. The cost: for big unsorted data MySQL must materialize and sort rows (“filesort” in EXPLAIN — Ch 16). An index on the sorted column can hand the engine pre-sorted data — one of the quiet ways indexes pay rent.</p>
+  </div>
+
+  <h2>LIMIT &amp; OFFSET — windows on a result set</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 2 · paging through 127 people</span></div>
+<pre class="sql">SELECT * FROM maqbool_info ORDER BY id LIMIT 10 OFFSET 0;    -- page 1
+SELECT * FROM maqbool_info ORDER BY id LIMIT 10 OFFSET 10;   -- page 2
+SELECT * FROM maqbool_info ORDER BY id LIMIT 10 OFFSET 20;   -- page 3
+SELECT * FROM maqbool_info ORDER BY id LIMIT 10 OFFSET 30;   -- page 4
+
+-- MySQL shorthand: LIMIT offset, count  (note the swapped order!)
+SELECT * FROM maqbool_info ORDER BY id LIMIT 20, 10;         -- = OFFSET 20 LIMIT 10</pre></div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — the pagination formula</div>
+    <p>For page <code class="ic">p</code> with <code class="ic">n</code> rows per page: <code class="ic">LIMIT n OFFSET (p-1)*n</code>. Page 5 of 10-per-page → <code class="ic">LIMIT 10 OFFSET 40</code>. Always pair the same <code class="ic">ORDER BY</code> with every page request — that's what makes “page 2” a <i>place</i> rather than a dice roll.</p>
+  </div>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out — LIMIT without ORDER BY is a lottery</div>
+    <p><code class="ic">SELECT * FROM maqbool_info LIMIT 10</code> returns “some 10 rows” — whichever the storage engine touches first, which can change with indexes, cache state, and updates. Two runs can disagree. Lecture 2's paged queries were only stable because <code class="ic">id</code> ordered them (explicitly or via the table's clustered index). <b>Rule: LIMIT in any serious query ⇒ ORDER BY a unique key.</b></p>
+  </div>
+
+  <h2>Top-N — the everyday pattern</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">pattern · reused in Project 1</span></div>
+<pre class="sql">-- the 5 oldest people:
+SELECT id, name, age
+FROM maqbool_info
+ORDER BY age DESC
+LIMIT 5;</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — deep pages get expensive</div>
+    <p><code class="ic">OFFSET 100000 LIMIT 10</code> makes MySQL produce, sort, and <i>throw away</i> 100,010 rows to show 10. Pages past the first few get slower linearly. Real apps switch to <b>keyset pagination</b> — “continue after the last id I saw”: <code class="ic">WHERE id &gt; 100000 ORDER BY id LIMIT 10</code> — constant speed at any depth, at the cost of “jump to page 47” links. File this away for your first dashboard.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 7</div>
+    <div class="exq">1. Page 6 of people, 8 per page, oldest first; identical ages broken by id ascending.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT id, name, age
+FROM maqbool_info
+ORDER BY age DESC, id ASC
+LIMIT 8 OFFSET 40;   -- (6-1)*8</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">page 6 · people ranked 41–48 oldest</span></div>
+<pre class="out">id    name             age
+----  ---------------  ----
+19    Vikram Desai      31
+67    Arjun Mehta       31
+4     Neha Kulkarni     30
+28    Rahul Pillai      30
+52    Divya Raman       30
+74    Karan Johar       30
+91    Sneha Reddy       29
+116   Aditya Rao        29</pre></div>
+    <div class="exq">2. The 3 newest confirmed orders (number + amount only).</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT order_number, total_amount
+FROM orders
+WHERE status = 'confirmed'
+ORDER BY created_at DESC, id DESC
+LIMIT 3;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">3 rows</span></div>
+<pre class="out">order_number         total_amount
+--------------------  -------------
+ORD-20260917-0493         8420.00
+ORD-20260916-0477        15630.25
+ORD-20260916-0461          734.50</pre></div>
+    <div class="exq">3. Why add <code class="ic">id DESC</code> as the tie-breaker in exercise 2?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">-- created_at has second/minute resolution: ties are certain. id is unique → deterministic, repeatable "newest first".</pre></details>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 7 — Sorting &amp; Paging</span><span class="fp">Page 10 · 23</span></footer>
+</section>
+<!-- ================================================================ CH 8 -->
+<section class="page" id="ch8">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part III · Analyzing Data</span><span class="cn">Chapter 08</span></div>
+    <h1>Aggregates — <span class="gt">COUNT, SUM, MIN, MAX, AVG</span></h1>
+    <p class="lede">An aggregate collapses many rows into one answer. Lecture 4 ran a beautiful experiment: make <code class="ic">age</code> nullable, then watch <code class="ic">COUNT(*)</code> and <code class="ic">COUNT(age)</code> disagree. That gap is this chapter's core lesson — aggregates have opinions about NULL, and you must know them.</p>
+  </header>
+
+  <h2>The five workhorses</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 4</span></div>
+<pre class="sql">SELECT COUNT(*)             AS total_rows,     -- every row
+       COUNT(age)           AS known_ages,     -- rows where age IS NOT NULL
+       COUNT(DISTINCT age)  AS different_ages, -- unique non-NULL ages
+       SUM(age)             AS total_age,      -- sum of non-NULL ages
+       MIN(age)             AS youngest,
+       MAX(age)             AS oldest,
+       AVG(age)             AS average_age
+FROM maqbool_info;</pre></div>
+
+  <table class="ref">
+    <tr><th>Function</th><th>Returns</th><th>NULL behavior</th></tr>
+    <tr><td><code>COUNT(*)</code></td><td>number of rows</td><td>counts everything, NULLs included</td></tr>
+    <tr><td><code>COUNT(col)</code></td><td>rows where col is known</td><td><b>skips NULLs</b></td></tr>
+    <tr><td><code>COUNT(DISTINCT col)</code></td><td>unique known values</td><td>skips NULLs</td></tr>
+    <tr><td><code>SUM(col)</code></td><td>total</td><td>skips NULLs — all-NULL input → returns <b>NULL</b>, not 0</td></tr>
+    <tr><td><code>MIN / MAX(col)</code></td><td>extremes</td><td>skips NULLs; empty input → NULL</td></tr>
+    <tr><td><code>AVG(col)</code></td><td>mean</td><td>skips NULLs — <i>and that changes the denominator!</i></td></tr>
+  </table>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — AVG's hidden division</div>
+    <p><code class="ic">AVG(age)</code> = <code class="ic">SUM(age) / COUNT(age)</code> — divided by <i>known</i> ages only. If 100 people have ages and 27 don't, the average is over 100, not 127. Sometimes that's exactly right (“average of known ages”), sometimes it's a lie (“average age of our users” should perhaps count unknowns as excluded, or be reported with the known-count next to it). That's why the lecture selected <code class="ic">COUNT(*)</code> and <code class="ic">COUNT(age)</code> <i>side by side</i>: always publish your denominator.</p>
+  </div>
+
+  <div class="co story"><div class="cot">📓 From your notebook — COUNT of an expression</div>
+    <p>Lecture 4 tried <code class="ic">SELECT COUNT(age &gt; 22) FROM maqbool_info;</code> expecting “people over 22”. It returned something suspicious: <b>COUNT counts non-NULLs</b>, and <code class="ic">age &gt; 22</code> evaluates to <code class="ic">1</code> or <code class="ic">0</code> — never NULL — for every known age. So it counted nearly everyone. The correct form (and a pattern you'll reuse constantly in Ch 15):</p>
+<pre class="sql">SELECT COUNT(*) FROM maqbool_info WHERE age &gt; 22;                  -- simplest
+SELECT SUM(age &gt; 22) FROM maqbool_info;                            -- counts the 1s
+SELECT COUNT(CASE WHEN age &gt; 22 THEN 1 END) FROM maqbool_info;     -- NULL when false → skipped</pre>
+  </div>
+
+  <h2>Aggregates are just numbers — do math with them</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 4</span></div>
+<pre class="sql">SELECT SUM(age) + COUNT(gender) FROM maqbool_info;   -- fine: each side collapses to a scalar
+SELECT SUM(age) / COUNT(*)    AS avg_incl_nulls     -- manual AVG that divides by ALL rows
+FROM maqbool_info;</pre></div>
+  <p>Because every aggregate returns a single value, expressions over aggregates behave like ordinary arithmetic — the seed of conditional aggregation (Ch 15) and per-group math (Ch 9).</p>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — alias everything you aggregate</div>
+    <p>Unaliased aggregates arrive with ugly headers like <code class="ic">COUNT(Distinct age)</code>. The lecture quickly adopted <code class="ic">AS total_age</code>, <code class="ic">AS minimum_age</code>. Aliases make results readable <i>and</i> let ORDER BY / wrappers reference the number later. One-word habit, permanent payoff.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 8</div>
+    <div class="exq">1. One row: how many orders, total revenue, biggest and smallest order, and average order value.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT COUNT(*)          AS order_count,
+       SUM(total_amount) AS revenue,
+       MIN(total_amount) AS smallest,
+       MAX(total_amount) AS biggest,
+       AVG(total_amount) AS avg_order
+FROM orders;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">1 row</span></div>
+<pre class="out">order_count   revenue      smallest   biggest    avg_order
+------------  -----------  ---------  ---------  -----------
+500           6287442.75     187.25   24997.60   12574.885500</pre></div>
+    <div class="exq">2. How many <i>distinct</i> payment methods has the store seen? How many customers have a known age — and how many don't?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT COUNT(DISTINCT payment_method) FROM orders;
+
+SELECT COUNT(*)   AS everyone,
+       COUNT(age) AS age_known,
+       COUNT(*) - COUNT(age) AS age_unknown
+FROM maqbool_info;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">two single-row results</span></div>
+<pre class="out">COUNT(DISTINCT payment_method)
+------------------------------
+6
+
+everyone   age_known   age_unknown
+---------  ----------  -----------
+127        124         3</pre></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 8 — Aggregates</span><span class="fp">Page 11 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 9 -->
+<section class="page" id="ch9">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part III · Analyzing Data</span><span class="cn">Chapter 09</span></div>
+    <h1>Grouping — <span class="gt">GROUP BY, HAVING</span> &amp; Duplicate Hunters</h1>
+    <p class="lede">One aggregate over a whole table answers one question. <code class="ic">GROUP BY</code> asks the question <i>once per category</i> — per name, per status, per pincode. And <code class="ic">HAVING</code> filters those answers. Lecture 4's duplicate hunt is the classic training ground.</p>
+  </header>
+
+  <h2>GROUP BY — one row per group</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 5</span></div>
+<pre class="sql">SELECT age         AS age,
+       COUNT(age)  AS age_count
+FROM maqbool_info
+GROUP BY age
+HAVING COUNT(age) &gt; 1        -- keep only ages shared by 2+ people
+ORDER BY age ASC;</pre></div>
+  <p>Mentally, the engine: sorts/buckets rows by <code class="ic">age</code>, then runs <code class="ic">COUNT</code> inside each bucket. One bucket → one output row. That's the whole trick — everything else is which bucket key and which filter.</p>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — only_full_group_by, and ANY_VALUE</div>
+    <p>Try <code class="ic">SELECT name, COUNT(*) FROM maqbool_info GROUP BY age;</code> and MySQL 8 (with <code class="ic">only_full_group_by</code> on, the default) refuses: <i>name</i> isn't grouped or aggregated — <b>which</b> name would the age-bucket even show? Every selected column must be either in <code class="ic">GROUP BY</code> or inside an aggregate. Lecture 4 hit this wall and escaped with the sanctioned shrug:</p>
+<pre class="sql">SELECT ANY_VALUE(id) AS id, ANY_VALUE(name) AS user_name,
+       ANY_VALUE(age) AS user_age, ANY_VALUE(gender) AS gender
+FROM maqbool_info
+GROUP BY name
+HAVING COUNT(*) &gt; 1;   -- duplicates exist; any one row per name is fine — we only care THAT it repeats</pre>
+    <p><code class="ic">ANY_VALUE</code> says “engine's choice”. Legit when repetition itself is the finding; a smell when you secretly wanted MIN/MAX.</p>
+  </div>
+
+  <h2>HAVING vs WHERE — the eternal interview question</h2>
+  <table class="ref">
+    <tr><th></th><th>WHERE</th><th>HAVING</th></tr>
+    <tr><td><b>Filters</b></td><td>individual rows</td><td>whole groups</td></tr>
+    <tr><td><b>Runs at step</b></td><td>2 (before grouping)</td><td>4 (after grouping)</td></tr>
+    <tr><td><b>Can use aggregates?</b></td><td>❌ no — rows aren't grouped yet</td><td>✅ yes — that's its job</td></tr>
+    <tr><td><b>May be used without GROUP BY?</b></td><td>always</td><td>yes — treats the whole table as one group</td></tr>
+  </table>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">the canonical combo</span></div>
+<pre class="sql">SELECT gender, COUNT(*) AS people, AVG(age) AS avg_age
+FROM maqbool_info
+WHERE is_student = TRUE          -- 1st: throw away rows we don't care about
+GROUP BY gender                  -- 2nd: bucket survivors
+HAVING COUNT(*) &gt; 10             -- 3rd: keep big buckets only
+ORDER BY people DESC;            -- 4th: rank them</pre></div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — filter early, filter cheap</div>
+    <p>Anything expressible in WHERE belongs in WHERE: rows discarded at step 2 never cost you grouping time. HAVING is <i>only</i> for aggregate conditions. The duplicate-hunt you'll run in Project 2 uses both: WHERE to scope, HAVING to judge the groups.</p>
+  </div>
+
+  <h2>Grouping by several columns</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 4</span></div>
+<pre class="sql">-- exact-duplicate detector: same name AND age AND gender more than once
+SELECT name, age, gender, COUNT(*) AS copies
+FROM maqbool_info
+GROUP BY name, age, gender
+HAVING COUNT(*) &gt; 0;     -- &gt; 1 to see only true duplicates</pre></div>
+  <p>Multi-column keys bucket on the <i>combination</i> — here, each distinct (name, age, gender) triple gets its own row. Swap the key to find anything repeated: duplicate emails, duplicate order numbers, duplicate enrollments (Project 2 exploits this defensively with a UNIQUE constraint instead).</p>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 9</div>
+    <div class="exq">1. Revenue and order count per order status, biggest revenue first, keeping only statuses with 20+ orders.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT status,
+       COUNT(*)          AS orders,
+       SUM(total_amount) AS revenue
+FROM orders
+GROUP BY status
+HAVING COUNT(*) &gt;= 20
+ORDER BY revenue DESC;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">6 rows — every status clears the HAVING bar</span></div>
+<pre class="out">status      orders   revenue
+----------  -------  -------------
+delivered       187   2352227.30
+confirmed        66    829940.20
+shipped          64    804117.55
+cancelled        63    789600.35
+pending          62    780452.90
+processing       58    731104.45</pre></div>
+    <div class="exq">2. Which pincode has the most customers? (Use <code class="ic">address</code>.)</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT pincode, COUNT(*) AS customers
+FROM address
+GROUP BY pincode
+ORDER BY customers DESC
+LIMIT 1;      -- add ORDER BY pincode as tie-breaker for determinism</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">1 row</span></div>
+<pre class="out">pincode   customers
+--------  ---------
+411001           14</pre></div>
+    <div class="exq">3. Why does <code class="ic">SELECT gender, AVG(age) FROM maqbool_info WHERE COUNT(*) &gt; 10 GROUP BY gender;</code> fail?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">-- WHERE (step 2) runs before grouping; COUNT(*) doesn't exist yet. The aggregate condition belongs in HAVING.</pre></details>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 9 — GROUP BY &amp; HAVING</span><span class="fp">Page 12 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 10 -->
+<section class="page" id="ch10">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part III · Analyzing Data</span><span class="cn">Chapter 10</span></div>
+    <h1>Subqueries — <span class="gt">Queries Inside Queries</span></h1>
+    <p class="lede">Sometimes the filter itself needs a query: “people whose age repeats”. Lecture 4 nested a GROUP BY inside a WHERE and it worked like a charm. This chapter formalizes the pattern — subqueries in WHERE, in SELECT, their NULL booby-trap, and when a JOIN is the better tool.</p>
+  </header>
+
+  <h2>The shape: WHERE col IN (SELECT …)</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 4</span></div>
+<pre class="sql">-- everyone whose age is shared by at least one other person
+SELECT * FROM maqbool_info
+WHERE age IN (
+    SELECT age
+    FROM maqbool_info
+    GROUP BY age
+    HAVING COUNT(age) &gt; 1        -- inner: ages that appear 2+ times
+)
+ORDER BY age ASC;</pre></div>
+  <p>Read it inside-out: the inner query computes the “wanted list”, the outer one filters against it. The inner query runs conceptually first (it has no dependency on outer rows — a <b>non-correlated</b> subquery).</p>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — decompose, then compose</div>
+    <p>The pro workflow for any nested query: <b>run the inner query alone</b>, look at its output (here: a column of repeated ages), <i>then</i> wrap it. If the inner result surprises you, the outer query was never your problem. Lecture 4 did exactly this dance — building the GROUP BY first, testing it, and only then embedding it in <code class="ic">WHERE name IN (…)</code> and its negated twin <code class="ic">WHERE NOT name IN (…)</code>.</p>
+  </div>
+
+  <h2>NOT IN — the NULL booby-trap</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">the classic production bug</span></div>
+<pre class="sql">-- ⚠️ if the inner query can return even ONE NULL,
+-- NOT IN returns ZERO rows. Always. Silently.
+SELECT * FROM maqbool_info
+WHERE age NOT IN (SELECT age FROM maqbool_info GROUP BY age HAVING COUNT(*) &gt; 1);
+
+-- why: age NOT IN (21, NULL, 30) becomes
+--      age &lt;&gt; 21 AND age &lt;&gt; NULL AND age &lt;&gt; 30
+-- and age &lt;&gt; NULL is UNKNOWN for every row → nothing survives WHERE.
+
+-- the safe forms:
+SELECT * FROM maqbool_info
+WHERE age NOT IN (SELECT age FROM maqbool_info GROUP BY age HAVING COUNT(*) &gt; 1)
+  AND age IS NOT NULL;                       -- guard the outer side
+
+SELECT * FROM maqbool_info m
+WHERE NOT EXISTS (SELECT 1 FROM maqbool_info x
+                  WHERE x.age = m.age        -- EXISTS ignores NULLs entirely
+                    AND x.id &lt;&gt; m.id);       -- (correlated form — see below)</pre></div>
+
+  <h2>Correlated subqueries &amp; scalar subqueries</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">patterns</span></div>
+<pre class="sql">-- CORRELATED: inner query references the outer row → runs once per outer row.
+-- People older than the average age of their own gender:
+SELECT name, gender, age
+FROM maqbool_info m
+WHERE age &gt; (SELECT AVG(age) FROM maqbool_info x
+             WHERE x.gender = m.gender);
+
+-- SCALAR: one value, usable anywhere an expression fits:
+SELECT name, age,
+       (SELECT MAX(age) FROM maqbool_info) AS oldest_in_table
+FROM maqbool_info;</pre></div>
+
+  <h2>Subquery or JOIN? A decision table</h2>
+  <table class="ref">
+    <tr><th>Situation</th><th>Reach for</th><th>Why</th></tr>
+    <tr><td>“rows matching a <i>computed list</i>”</td><td><code>IN (SELECT …)</code></td><td>reads like the question itself</td></tr>
+    <tr><td>“rows with <i>no</i> match” (negation)</td><td><code>NOT EXISTS</code> / anti-JOIN (Ch 12)</td><td>immune to the NULL trap</td></tr>
+    <tr><td>“<i>columns from another table</i> per row”</td><td>JOIN</td><td>one pass, index-friendly</td></tr>
+    <tr><td>“compare each row to an aggregate”</td><td>correlated scalar subquery</td><td>often clearer than a GROUP BY + JOIN</td></tr>
+    <tr><td>top-N <i>per group</i></td><td>window functions (beyond this guide)</td><td>built for exactly this</td></tr>
+  </table>
+
+  <div class="co tip"><div class="cot">💡 Pro tip</div>
+    <p>MySQL 8's optimizer rewrites most <code class="ic">IN (SELECT …)</code> into semi-joins anyway, so don't fear subqueries for performance — fear ambiguity for correctness. Choose the form a teammate will read correctly at 2 a.m.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 10</div>
+    <div class="exq">1. Customers who have placed at least one order — using a subquery (no JOIN yet).</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT id, name FROM maqbool_info
+WHERE id IN (SELECT user_id FROM orders);</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">5 of 122 rows — everyone except the 5 who never ordered</span></div>
+<pre class="out">id    name
+----  ----------------
+1     Arbaz
+2     Maqbool
+3     Vikram Desai
+4     Neha Kulkarni
+6     Esha Solanki
+… 117 more rows</pre></div>
+    <div class="exq">2. The same, but the opposite: customers with <b>no</b> orders — safely.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT id, name FROM maqbool_info m
+WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = m.id);
+-- Project 1 redoes this with LEFT JOIN … IS NULL, the other classic anti-join.</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">5 rows — registered but never bought</span></div>
+<pre class="out">id    name
+----  --------------
+87    Riya Sharma
+93    Kabir Menon
+100   Isha Verma
+111   Dev Raghavan
+125   Tara Bose</pre></div>
+    <div class="exq">3. Orders costing more than the store-wide average.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT order_number, total_amount
+FROM orders
+WHERE total_amount &gt; (SELECT AVG(total_amount) FROM orders);</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">5 of 247 rows — the costlier half of the store</span></div>
+<pre class="out">order_number         total_amount
+-------------------- -------------
+ORD-20260830-0226         24997.60
+ORD-20260719-0354         23410.15
+ORD-20260901-0007         22988.40
+ORD-20260728-0187         17320.50
+ORD-20260711-0149         16255.80
+… 242 more rows</pre></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 10 — Subqueries</span><span class="fp">Page 13 · 23</span></footer>
+</section>
+<!-- ================================================================ CH 11 -->
+<section class="page" id="ch11">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part IV · Relationships</span><span class="cn">Chapter 11</span></div>
+    <h1>Relationships &amp; <span class="gt">Foreign Keys</span></h1>
+    <p class="lede">Real data is connected: people place orders, live at addresses, enroll in courses. Lectures 5–7 built all three relationship shapes. This chapter names them, enforces them with foreign keys, and shows the one table trick that makes many-to-many possible.</p>
+  </header>
+
+  <h2>The three shapes — all present in this dataset</h2>
+
+  <svg class="dgm" viewBox="0 0 900 445" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Entity relationship diagram">
+    <defs>
+      <linearGradient id="erband" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#5b4df0"/><stop offset="1" stop-color="#b44df0"/>
+      </linearGradient>
+    </defs>
+    <style>
+      .ent rect.box{fill:#f7f8ff;stroke:#c9cef0;stroke-width:1.5;rx:8}
+      .ent .band{fill:url(#erband)}
+      .ent .t{fill:#fff;font-weight:700;font-size:13px;font-family:'Segoe UI',sans-serif}
+      .ent .c{fill:#3a4166;font-size:11.5px;font-family:Consolas,monospace}
+      .ent .pk{fill:#b44df0;font-weight:700}
+      .ent .fk{fill:#0e9f6e;font-weight:700}
+      .rel{stroke:#8a90ad;stroke-width:1.8;fill:none}
+      .lab{fill:#5b5f80;font-size:12px;font-weight:800;font-family:'Segoe UI',sans-serif}
+      .cap{fill:#8a90ad;font-size:11px;font-family:'Segoe UI',sans-serif}
+    </style>
+
+    <!-- maqbool_info -->
+    <g class="ent">
+      <rect class="box" x="20" y="55" width="215" height="150" rx="8"/>
+      <rect class="band" x="20" y="55" width="215" height="27" rx="8"/>
+      <rect class="band" x="20" y="70" width="215" height="12"/>
+      <text class="t" x="30" y="74">maqbool_info</text>
+      <text class="c pk" x="30" y="100">🔑 id</text>
+      <text class="c" x="30" y="120">name</text>
+      <text class="c" x="30" y="140">age</text>
+      <text class="c" x="30" y="160">gender</text>
+      <text class="c" x="30" y="180">is_student</text>
+      <text class="c" x="30" y="198">phone_number</text>
+    </g>
+
+    <!-- orders -->
+    <g class="ent">
+      <rect class="box" x="355" y="20" width="235" height="170" rx="8"/>
+      <rect class="band" x="355" y="20" width="235" height="27" rx="8"/>
+      <rect class="band" x="355" y="35" width="235" height="12"/>
+      <text class="t" x="365" y="39">orders</text>
+      <text class="c pk" x="365" y="65">🔑 id</text>
+      <text class="c fk" x="365" y="85">🔗 user_id  (FK)</text>
+      <text class="c" x="365" y="105">order_number</text>
+      <text class="c" x="365" y="125">status</text>
+      <text class="c" x="365" y="145">total_amount</text>
+      <text class="c" x="365" y="165">payment_method</text>
+      <text class="c" x="365" y="183">created_at</text>
+    </g>
+
+    <!-- address -->
+    <g class="ent">
+      <rect class="box" x="355" y="270" width="235" height="115" rx="8"/>
+      <rect class="band" x="355" y="270" width="235" height="27" rx="8"/>
+      <rect class="band" x="355" y="285" width="235" height="12"/>
+      <text class="t" x="365" y="289">address</text>
+      <text class="c pk" x="365" y="315">🔑 id</text>
+      <text class="c fk" x="365" y="335">🔗 user_id  (FK, UNIQUE)</text>
+      <text class="c" x="365" y="355">address</text>
+      <text class="c" x="365" y="375">pincode</text>
+    </g>
+
+    <!-- students -->
+    <g class="ent">
+      <rect class="box" x="675" y="20" width="200" height="100" rx="8"/>
+      <rect class="band" x="675" y="20" width="200" height="27" rx="8"/>
+      <rect class="band" x="675" y="35" width="200" height="12"/>
+      <text class="t" x="685" y="39">students</text>
+      <text class="c pk" x="685" y="65">🔑 id</text>
+      <text class="c" x="685" y="85">name</text>
+      <text class="c" x="685" y="105">email</text>
+    </g>
+
+    <!-- courses -->
+    <g class="ent">
+      <rect class="box" x="675" y="160" width="200" height="100" rx="8"/>
+      <rect class="band" x="675" y="160" width="200" height="27" rx="8"/>
+      <rect class="band" x="675" y="175" width="200" height="12"/>
+      <text class="t" x="685" y="179">courses</text>
+      <text class="c pk" x="685" y="205">🔑 id</text>
+      <text class="c" x="685" y="225">course_name</text>
+      <text class="c" x="685" y="245">instructor</text>
+    </g>
+
+    <!-- student_courses -->
+    <g class="ent">
+      <rect class="box" x="655" y="310" width="240" height="115" rx="8"/>
+      <rect class="band" x="655" y="310" width="240" height="27" rx="8"/>
+      <rect class="band" x="655" y="325" width="240" height="12"/>
+      <text class="t" x="665" y="329">student_courses (junction)</text>
+      <text class="c pk" x="665" y="355">🔑 id</text>
+      <text class="c fk" x="665" y="375">🔗 student_id  (FK)</text>
+      <text class="c fk" x="665" y="395">🔗 course_id  (FK)</text>
+      <text class="c" x="665" y="415">enrollment_at</text>
+    </g>
+
+    <!-- rel: person 1 - N orders -->
+    <line class="rel" x1="235" y1="105" x2="355" y2="105"/>
+    <text class="lab" x="243" y="98">1</text>
+    <text class="lab" x="334" y="98">N</text>
+    <text class="cap" x="252" y="122">places</text>
+
+    <!-- rel: person 1 - 1 address -->
+    <line class="rel" x1="235" y1="330" x2="355" y2="330"/>
+    <text class="lab" x="243" y="323">1</text>
+    <text class="lab" x="334" y="323">1</text>
+    <text class="cap" x="262" y="347">lives at</text>
+
+    <!-- rel: students 1 - N junction -->
+    <polyline class="rel" points="675,60 640,60 640,365 655,365"/>
+    <text class="lab" x="648" y="52">1</text>
+    <text class="lab" x="645" y="358">N</text>
+
+    <!-- rel: courses 1 - N junction -->
+    <polyline class="rel" points="675,210 622,210 622,395 655,395"/>
+    <text class="lab" x="648" y="202">1</text>
+    <text class="lab" x="626" y="388">N</text>
+
+    <text class="cap" x="20" y="30">1 : N — one person, many orders</text>
+    <text class="cap" x="20" y="250">1 : 1 — one address per person</text>
+    <text class="cap" x="600" y="290">M : N — via junction table</text>
+  </svg>
+
+  <h2>Enforcing it: FOREIGN KEY</h2>
+  <p>Lecture 6 didn't just join tables — it wired them so the <i>database</i> refuses orphan rows:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 6</span></div>
+<pre class="sql">-- the FK columns must exist, be NOT NULL, and match the parent's type:
+ALTER TABLE orders  MODIFY user_id INT UNSIGNED NOT NULL;
+ALTER TABLE address MODIFY user_id INT NOT NULL;
+
+ALTER TABLE orders
+  ADD CONSTRAINT fk_user_orders
+  FOREIGN KEY (user_id) REFERENCES maqbool_info(id);
+
+ALTER TABLE address
+  ADD CONSTRAINT fk_users_address
+  FOREIGN KEY (user_id) REFERENCES maqbool_info(id);
+
+-- prove the wiring — ask the catalog:
+SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME,
+       REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_NAME IS NOT NULL
+  AND TABLE_SCHEMA = 'maqbool';</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — referential integrity</div>
+    <p>A FK is a live promise: <i>every child's <code class="ic">user_id</code> points at a real parent</i>. Insert an order for user 9999 → rejected. Delete user 5 who has orders → rejected (default <code class="ic">RESTRICT</code>) — protecting you from orphaned data. The trade-off is real though: FK checks cost a little on writes, and legacy/bulk-loading systems sometimes skip FKs and enforce the rule in application code. Know which world you're in.</p>
+  </div>
+
+  <h2>Many-to-many — the junction table</h2>
+  <p>A student takes many courses; a course holds many students. No column can store that on either side — so Lecture 7 created a third table whose <i>job</i> is only to hold the pairs:</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 7</span></div>
+<pre class="sql">CREATE TABLE student_courses (
+    id            INT PRIMARY KEY AUTO_INCREMENT,
+    student_id    INT NOT NULL,
+    course_id     INT NOT NULL,
+    enrollment_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student FOREIGN KEY (student_id) REFERENCES students(id)
+                           ON DELETE CASCADE,
+    CONSTRAINT fk_course  FOREIGN KEY (course_id)  REFERENCES courses(id)
+                           ON DELETE CASCADE,
+    UNIQUE (student_id, course_id)     -- one enrollment per pair, ever
+);
+
+INSERT INTO student_courses (student_id, course_id) VALUES
+(1, 1),  -- Arbaz   → MySQL
+(1, 2),  -- Arbaz   → React
+(1, 3),  -- Arbaz   → Node.js
+(2, 1),  -- Maqbool → MySQL
+(2, 3),  -- Maqbool → Node.js
+(3, 2);  -- Zara    → React</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — two quiet geniuses in that DDL</div>
+    <p><b><code class="ic">ON DELETE CASCADE</code></b>: delete a course and its enrollments vanish automatically — no orphans possible. (<code class="ic">RESTRICT</code> would refuse instead; choose per relationship.) <b><code class="ic">UNIQUE(student_id, course_id)</code></b>: a composite constraint on the <i>pair</i>, not either column alone — Arbaz may take MySQL once, but Arbaz + MySQL twice is now impossible at the engine level. Composite keys are also the answer to “how do I prevent duplicate sign-ups/likes/follows” in any app.</p>
+  </div>
+
+  <h2>Normalization in 60 seconds</h2>
+  <ul>
+    <li><b>1NF</b> — atomic values: no “phone1, phone2” columns, no comma-separated lists in one cell (why the junction table exists).</li>
+    <li><b>2NF</b> — non-key columns depend on the <i>whole</i> key (no “instructor name” stored inside <code class="ic">student_courses</code>).</li>
+    <li><b>3NF</b> — non-key columns depend on the key <i>only</i> (pincode city is not stored in <code class="ic">address</code>; it would drift when pincodes change — compute or join instead).</li>
+  </ul>
+  <p>Your dataset already follows these — which is exactly why queries in Ch 12 need joins to reassemble it.</p>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 11</div>
+    <div class="exq">1. Add a <code class="ic">reviews</code> table (1 person → many reviews): rating 1–5, FK to <code class="ic">maqbool_info</code>, cascade on delete.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">CREATE TABLE reviews (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT UNSIGNED NOT NULL,
+    rating     TINYINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_reviews FOREIGN KEY (user_id)
+        REFERENCES maqbool_info(id) ON DELETE CASCADE
+);</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">mysql shell</span></div>
+<pre class="out">Query OK, 0 rows affected (0.04 sec)</pre></div>
+    <div class="exq">2. Try <code class="ic">INSERT INTO orders (user_id, …) VALUES (9999, …)</code> — read the error. Then check which constraint the catalog query above reports.</div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 11 — Relationships &amp; Foreign Keys</span><span class="fp">Page 14 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 12 -->
+<section class="page" id="ch12">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part IV · Relationships</span><span class="cn">Chapter 12</span></div>
+    <h1>Joins — <span class="gt">INNER, LEFT, RIGHT, CROSS</span></h1>
+    <p class="lede">Normalization split the story across tables; joins put it back together. Lectures 5–7 practiced every join type against people, orders and addresses. Learn the two questions each join answers — “who matched?” and “who's missing?” — and 90% of join confusion evaporates.</p>
+  </header>
+
+  <h2>The four join types at a glance</h2>
+
+  <div class="venns">
+    <div class="vencard">
+      <div class="vt">INNER JOIN</div>
+      <svg width="230" height="128" viewBox="0 0 230 128">
+        <defs><clipPath id="cA1"><circle cx="88" cy="62" r="46"/></clipPath></defs>
+        <circle cx="142" cy="62" r="46" fill="#e84ac0" opacity=".85" clip-path="url(#cA1)"/>
+        <circle cx="88" cy="62" r="46" fill="none" stroke="#5b4df0" stroke-width="2"/>
+        <circle cx="142" cy="62" r="46" fill="none" stroke="#e84ac0" stroke-width="2"/>
+        <text x="52" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">people</text>
+        <text x="138" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">orders</text>
+      </svg>
+      <div class="vd">only rows that match in <b>both</b> tables</div>
+    </div>
+    <div class="vencard">
+      <div class="vt">LEFT JOIN</div>
+      <svg width="230" height="128" viewBox="0 0 230 128">
+        <circle cx="88" cy="62" r="46" fill="#5b4df0" opacity=".85"/>
+        <circle cx="142" cy="62" r="46" fill="none" stroke="#e84ac0" stroke-width="2"/>
+        <text x="52" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">people</text>
+        <text x="138" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">orders</text>
+      </svg>
+      <div class="vd">all left rows; NULLs where no match</div>
+    </div>
+    <div class="vencard">
+      <div class="vt">RIGHT JOIN</div>
+      <svg width="230" height="128" viewBox="0 0 230 128">
+        <circle cx="142" cy="62" r="46" fill="#e84ac0" opacity=".85"/>
+        <circle cx="88" cy="62" r="46" fill="none" stroke="#5b4df0" stroke-width="2"/>
+        <text x="52" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">people</text>
+        <text x="138" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">orders</text>
+      </svg>
+      <div class="vd">all right rows; NULLs where no match</div>
+    </div>
+    <div class="vencard">
+      <div class="vt">CROSS JOIN</div>
+      <svg width="230" height="128" viewBox="0 0 230 128">
+        <g fill="none" stroke-width="1.5">
+          <circle cx="88" cy="62" r="46" stroke="#5b4df0"/>
+          <circle cx="142" cy="62" r="46" stroke="#e84ac0"/>
+        </g>
+        <text x="93" y="68" font-size="22" fill="#3a4166" font-weight="bold" font-family="Segoe UI">×</text>
+        <text x="52" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">people</text>
+        <text x="138" y="120" font-size="10.5" fill="#5b5f80" font-family="Segoe UI">orders</text>
+      </svg>
+      <div class="vd">every combination — 127 × 500 rows</div>
+    </div>
+  </div>
+
+  <h2>INNER JOIN — the workhorse</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 5</span></div>
+<pre class="sql">SELECT m.id, m.name, m.age,
+       o.order_number, o.status, o.total_amount
+FROM maqbool_info AS m
+INNER JOIN orders AS o ON o.user_id = m.id
+ORDER BY m.name ASC
+LIMIT 10 OFFSET 0;
+
+-- same query, one filter on the joined table, cleaner with aliases:
+SELECT m.name, o.status, o.total_amount
+FROM maqbool_info m
+INNER JOIN orders o ON o.user_id = m.id
+WHERE o.status IN ('delivered', 'confirmed', 'pending')
+  AND m.age NOT IN (21, 31, 44)
+ORDER BY m.age ASC;</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — what ON really does</div>
+    <p>Conceptually, <code class="ic">FROM a JOIN b ON …</code> considers row-pairs where the condition holds (the storage engine uses indexes to skip most pairs — a nested-loop over an index, which is why FK columns should be indexed). People with no orders simply produce no qualifying pair, so INNER JOIN <b>silently drops them</b>. If “who never ordered?” matters — and it always does — you need LEFT JOIN (next).</p>
+  </div>
+
+  <h2>LEFT JOIN — keeping the unmatched</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 5</span></div>
+<pre class="sql">SELECT m.id, m.name, o.order_number, o.status, o.total_amount
+FROM maqbool_info m
+LEFT JOIN orders o ON o.user_id = m.id;
+
+-- the anti-join: people with NO orders at all
+SELECT m.id, m.name
+FROM maqbool_info m
+LEFT JOIN orders o ON o.user_id = m.id
+WHERE o.user_id IS NULL;</pre></div>
+  <p>For a person with no orders, LEFT JOIN still emits their row — with <code class="ic">NULL</code> in every orders column. That's the mechanism: <i>left side preserved, missing right side becomes NULL</i>. Filtering on <code class="ic">o.some_col IS NULL</code> therefore isolates exactly the no-match rows. This is the <b>anti-join</b> — the idiom behind “users with no purchases”, “students with no enrollment”, “products never ordered”.</p>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out — WHERE can silently un-LEFT a LEFT JOIN</div>
+    <p><code class="ic">LEFT JOIN orders o … WHERE o.status = 'delivered'</code> discards the NULL rows — the join might as well have been INNER. To filter the right table <i>while keeping</i> unmatched left rows, put the condition in the ON clause: <code class="ic">LEFT JOIN orders o ON o.user_id = m.id AND o.status = 'delivered'</code>. ON decides <i>matching</i>; WHERE decides <i>surviving</i>.</p>
+  </div>
+
+  <h2>RIGHT JOIN, three-table chains, and FULL OUTER</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lectures 6 &amp; 7</span></div>
+<pre class="sql">-- RIGHT = LEFT with the tables swapped; same engine work:
+SELECT m.name, o.order_number, o.status
+FROM maqbool_info m
+RIGHT JOIN orders o ON m.id = o.user_id;
+
+-- chaining three tables (Lecture 7's flagship query):
+SELECT m.name, o.status, o.total_amount, ad.address, ad.pincode
+FROM maqbool_info m
+JOIN orders  o  ON m.id = o.user_id
+JOIN address ad ON m.id = ad.user_id
+WHERE o.status = 'processing' AND m.gender = 'male';
+
+-- MySQL has no FULL OUTER JOIN — emulate with UNION (Lecture 5):
+SELECT m.id, o.user_id FROM maqbool_info m
+LEFT JOIN orders o ON o.user_id = m.id
+WHERE m.id IS NOT NULL
+UNION
+SELECT m.id, o.user_id FROM maqbool_info m
+RIGHT JOIN orders o ON m.id = o.user_id;
+
+-- CROSS JOIN: every person × every product-sized table — rare on purpose.
+SELECT COUNT(*) FROM maqbool_info CROSS JOIN orders;   -- 127 × 500 = 63,500</pre></div>
+
+  <table class="ref">
+    <tr><th>Join</th><th>Keeps</th><th>Everyday question</th></tr>
+    <tr><td><code>INNER</code></td><td>matches only</td><td>“show orders with their buyer”</td></tr>
+    <tr><td><code>LEFT</code></td><td>all left + matches (+NULLs)</td><td>“all customers, and orders if any” / anti-join</td></tr>
+    <tr><td><code>RIGHT</code></td><td>all right + matches</td><td>rare — usually rewritten as LEFT</td></tr>
+    <tr><td><code>CROSS</code></td><td>every combination</td><td>generating grids, test matrices</td></tr>
+    <tr><td><code>FULL (via UNION)</code></td><td>everything from both sides</td><td>“show unmatched from <i>both</i> sides”</td></tr>
+  </table>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — alias immediately, qualify always</div>
+    <p>From your first join, write <code class="ic">m</code>, <code class="ic">o</code>, <code class="ic">ad</code> and prefix <i>every</i> column. Unqualified <code class="ic">id</code> in a two-table query is an “ambiguous column” error waiting to happen; qualified names also make a 4-table query readable. Lecture 6's join of <code class="ic">m.id, o.id, o.user_id, a.user_id</code> was only decipherable because each was aliased (<code class="ic">AS address_id</code>, <code class="ic">AS address_user_id</code>).</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 12</div>
+    <div class="exq">1. Every student with their course names (triple join through the junction), one row per enrollment.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT s.name AS student, c.course_name, sc.enrollment_at
+FROM students s
+JOIN student_courses sc ON sc.student_id = s.id
+JOIN courses c          ON c.id = sc.course_id
+ORDER BY s.name, c.course_name;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">6 rows — one per enrollment</span></div>
+<pre class="out">student   course_name   enrollment_at
+--------  ------------  ---------------------
+Arbaz     MySQL         2026-09-02 10:15:03
+Arbaz     Node.js       2026-09-02 10:16:12
+Arbaz     React         2026-09-02 10:15:41
+Maqbool   MySQL         2026-09-05 16:40:09
+Maqbool   Node.js       2026-09-05 16:41:33
+Zara      React         2026-09-10 09:22:47</pre></div>
+    <div class="exq">2. Courses nobody enrolled in — anti-join.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT c.course_name
+FROM courses c
+LEFT JOIN student_courses sc ON sc.course_id = c.id
+WHERE sc.course_id IS NULL;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">every course has takers — the anti-join finds nothing</span></div>
+<pre class="out">Empty set (0.00 sec)</pre></div>
+    <div class="exq">3. People + address + order count per person, including people with zero orders (count must show 0, not disappear).</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT m.name, ad.pincode, COUNT(o.id) AS order_count
+FROM maqbool_info m
+LEFT JOIN address ad ON ad.user_id = m.id
+LEFT JOIN orders  o  ON o.user_id  = m.id
+GROUP BY m.id, m.name, ad.pincode
+ORDER BY order_count DESC;
+-- COUNT(o.id) skips NULLs → unmatched people show 0. COUNT(*) would wrongly show 1.</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">top 5 of 127 rows — and the zeros at the bottom</span></div>
+<pre class="out">name            pincode   order_count
+--------------  --------  -----------
+Ananya Iyer       411001           16
+Rohan Gupta       411014           15
+Arbaz             411001           14
+Meera Nair        411028           13
+Farhan Qureshi    411045           13
+… 117 more rows
+Riya Sharma       411032            0
+Kabir Menon       411006            0
+Isha Verma        411058            0
+Dev Raghavan      411020            0
+Tara Bose         411014            0</pre></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 12 — Joins</span><span class="fp">Page 15 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 13 -->
+<section class="page" id="ch13">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part V · Power Tools</span><span class="cn">Chapter 13</span></div>
+    <h1>Transactions — <span class="gt">COMMIT, ROLLBACK &amp; ACID</span></h1>
+    <p class="lede">Lecture 4 ran an UPDATE, saw the damage, and typed one word to undo it: <code class="ic">ROLLBACK</code>. That safety net is the transaction — the difference between “I hope my multi-step change works” and “it either all happens or none of it does”.</p>
+  </header>
+
+  <h2>The demo you already ran</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 4</span></div>
+<pre class="sql">START TRANSACTION;
+
+UPDATE maqbool_info SET age = 23 WHERE name LIKE 'Arbaz%';
+SELECT * FROM maqbool_info WHERE name LIKE 'Arbaz%';  -- changed… but only for ME
+
+ROLLBACK;                                             -- ⏪ pretend none of it happened
+
+SELECT * FROM maqbool_info WHERE name LIKE 'Arbaz%';  -- original ages restored
+
+-- and the keep-it version:
+START TRANSACTION;
+UPDATE maqbool_info SET name = 'Arbaz khan' WHERE name = 'Arbaz';
+COMMIT;                                               -- 🔒 now it's permanent</pre></div>
+
+  <div class="flow" style="max-width:640px">
+    <div class="fstep"><span class="n">1</span><span class="code">START TRANSACTION;</span><span class="why">open a private draft</span></div>
+    <div class="farrow">↓</div>
+    <div class="fstep"><span class="n">2</span><span class="code">INSERT / UPDATE / DELETE …</span><span class="why">your session sees changes; others don't — yet</span></div>
+    <div class="farrow">↓ &nbsp;branch&nbsp; ↙</div>
+    <div class="fstep"><span class="n">3a</span><span class="code">COMMIT;</span><span class="why">✅ make it permanent &amp; visible to everyone</span></div>
+    <div class="fstep"><span class="n">3b</span><span class="code">ROLLBACK;</span><span class="why">↩️ discard every change since step 1</span></div>
+  </div>
+
+  <h2>ACID — the four guarantees</h2>
+  <table class="ref">
+    <tr><th>Letter</th><th>Guarantee</th><th>In practice</th></tr>
+    <tr><td><b>A</b>tomicity</td><td>all or nothing</td><td>a transfer = debit + credit; a crash mid-way undoes both</td></tr>
+    <tr><td><b>C</b>onsistency</td><td>constraints hold before &amp; after</td><td>a commit can never leave a FK broken or a UNIQUE duplicated</td></tr>
+    <tr><td><b>I</b>solation</td><td>concurrent transactions don't trample</td><td>your uncommitted draft is invisible to other sessions</td></tr>
+    <tr><td><b>D</b>urability</td><td>committed = survives power loss</td><td>the redo log flushes before COMMIT returns</td></tr>
+  </table>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — autocommit, the invisible default</div>
+    <p>MySQL commits <b>every single statement automatically</b> unless you're inside a transaction. That's why your one-off UPDATEs from earlier chapters were instantly permanent. <code class="ic">START TRANSACTION</code> suspends autocommit until COMMIT/ROLLBACK. Also crucial for the Ch 3 table: <b>DDL statements (CREATE/ALTER/DROP/TRUNCATE) cause an implicit commit</b> — you cannot roll back a <code class="ic">TRUNCATE</code> even inside a transaction, but you <i>can</i> roll back a <code class="ic">DELETE</code>.</p>
+  </div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — wrap risky UPDATE/DELETE in the ritual</div>
+<pre class="sql">START TRANSACTION;
+UPDATE … ;  -- check the affected-rows count matches expectations!
+SELECT … ;  -- eyeball the damage before committing
+-- happy? COMMIT;  — horrified? ROLLBACK;</pre>
+    <p>Long transactions block other writers and bloat undo logs — keep them seconds long, not hours. For checkpoints inside long jobs, use <code class="ic">SAVEPOINT sp1;</code> / <code class="ic">ROLLBACK TO sp1;</code>.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 13</div>
+    <div class="exq">1. Simulate a money move: order #5's amount +500, order #9's amount −500 — atomically. Test rollback, then commit for real.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">START TRANSACTION;
+UPDATE orders SET total_amount = total_amount + 500 WHERE id = 5;
+UPDATE orders SET total_amount = total_amount - 500 WHERE id = 9;
+SELECT id, total_amount FROM orders WHERE id IN (5, 9);  -- verify
+ROLLBACK;   -- rehearsal first!
+-- then rerun with COMMIT;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">inside the transaction … then after ROLLBACK</span></div>
+<pre class="out">id   total_amount        ← inside the transaction (was 4382.75 / 18204.10)
+---  ------------
+5          4882.75
+9         17704.10
+
+Query OK    ← ROLLBACK: both updates discarded
+
+id   total_amount        ← re-check: originals restored
+---  ------------
+5          4382.75
+9         18204.10</pre></div>
+    <div class="exq">2. Why did Lecture 4's first <code class="ic">ROLLBACK</code> after <code class="ic">COMMIT</code> change nothing?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">-- COMMIT made the changes permanent; ROLLBACK only discards work done since the LAST commit/START TRANSACTION — there was none left to discard.</pre></details>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 13 — Transactions</span><span class="fp">Page 16 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 14 -->
+<section class="page" id="ch14">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part V · Power Tools</span><span class="cn">Chapter 14</span></div>
+    <h1>Views — <span class="gt">Saved Queries as Virtual Tables</span></h1>
+    <p class="lede">Lecture 7's best join ran over five lines and needed remembering every time. So the lectures saved it: <code class="ic">CREATE VIEW GetALLCustomersData</code>. A view is a named SELECT the database keeps on file — query it like a table, and the query runs fresh every time.</p>
+  </header>
+
+  <h2>Create once, query forever</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 7</span></div>
+<pre class="sql">CREATE VIEW GetALLCustomersData AS
+SELECT m.id AS maqbool_id, m.name, m.gender, m.age,
+       o.id AS orders_id, o.status, o.item_count, o.total_amount,
+       ad.address, ad.pincode
+FROM maqbool_info m
+JOIN orders  o  ON m.id = o.user_id
+JOIN address ad ON m.id = ad.user_id;
+
+-- now the monster query is one line — with WHERE and ORDER BY on top:
+SELECT * FROM GetALLCustomersData
+WHERE pincode = 411001 AND status = 'confirmed';
+
+SELECT * FROM GetALLCustomersData WHERE gender = 'male';
+
+-- inspect your views:
+SHOW FULL TABLES WHERE TABLE_TYPE = 'VIEW';
+SHOW CREATE VIEW GetALLCustomersData;
+SELECT TABLE_NAME AS view_name, VIEW_DEFINITION
+FROM INFORMATION_SCHEMA.VIEWS
+WHERE TABLE_SCHEMA = 'maqbool';</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — a view is a window, not a copy</div>
+    <p>No data is stored at CREATE time (it's “virtual”). Every SELECT on the view <i>re-executes</i> the underlying query against today's data — insert a new order and the view instantly shows it. Two consequences: views always reflect reality (great), but they are exactly as fast as their underlying query (a slow 5-table join stays slow behind a pretty name — indexes on base tables are what save you, Ch 17). MySQL has no materialized views; for heavy aggregates you'd summarize into a real table on a schedule.</p>
+  </div>
+
+  <h2>Why views earn their place</h2>
+  <ul>
+    <li><b>Simplification</b> — the triple join, its aliases, its quirks: written once. Consumers just <code class="ic">SELECT</code>.</li>
+    <li><b>A stable API</b> — apps talk to <code class="ic">GetALLCustomersData</code>; when the schema underneath changes, you repair <i>one</i> view instead of hunting every query.</li>
+    <li><b>Security</b> — grant access to a view exposing only <code class="ic">name, pincode</code>, never the base table with phones and ages.</li>
+    <li><b>Different lenses</b> — Lecture 7 built <code class="ic">GetCustomerWithOrderAndAddress</code> with LEFT/RIGHT joins (keeping partially-matched people/addresses) and <code class="ic">GetALLCustomersData</code> with strict INNER joins (only fully-connected rows). Same data, two deliberate perspectives.</li>
+  </ul>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 6 · first view</span></div>
+<pre class="sql">CREATE VIEW maqbool_order AS
+SELECT m.id, m.age, m.is_student, m.gender, m.name,
+       o.status, o.id AS order_id, o.user_id, o.total_amount
+FROM maqbool_info m
+JOIN orders o ON m.id = o.user_id
+WHERE o.status = 'confirmed';
+
+SELECT * FROM maqbool_order LIMIT 10 OFFSET 0;
+
+-- maintain them:
+ALTER VIEW maqbool_order AS SELECT … ;   -- replace the definition
+DROP VIEW maqbool_order;                 -- remove it (data untouched — there is none)</pre></div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — simple views are updatable</div>
+    <p>A view on one table without GROUP BY/DISTINCT can take INSERT/UPDATE/DELETE — the engine routes them to the base table. Handy for exposing a cleaned-up subset to an app while hiding columns. (The join-heavy views above are read-only.)</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 14</div>
+    <div class="exq">1. Build <code class="ic">v_enrollments</code>: student name, course name, instructor, enrollment date — then use it to list Arbaz's schedule in one line.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">CREATE VIEW v_enrollments AS
+SELECT s.name AS student, c.course_name, c.instructor, sc.enrollment_at
+FROM students s
+JOIN student_courses sc ON sc.student_id = s.id
+JOIN courses c          ON c.id = sc.course_id;
+
+SELECT * FROM v_enrollments WHERE student = 'Arbaz';</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">CREATE VIEW, then the one-liner</span></div>
+<pre class="out">Query OK, 0 rows affected (0.01 sec)
+
+student   course_name   instructor   enrollment_at
+--------  ------------  ----------  ---------------------
+Arbaz     MySQL         Rahul       2026-09-02 10:15:03
+Arbaz     Node.js       Priya       2026-09-02 10:16:12
+Arbaz     React         Amit        2026-09-02 10:15:41</pre></div>
+    <div class="exq">2. Insert a new order, then re-select the view from exercise 1's sibling — confirm the new row appears with zero changes to the view.</div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 14 — Views</span><span class="fp">Page 17 · 23</span></footer>
+</section>
+<!-- ================================================================ CH 15 -->
+<section class="page" id="ch15">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part V · Power Tools</span><span class="cn">Chapter 15</span></div>
+    <h1>CASE &amp; Conditionals — <span class="gt">Tiers, Pivots, IFNULL</span></h1>
+    <p class="lede">Raw rows rarely answer business questions — “which customers are Platinum?” does. <code class="ic">CASE</code> turns conditions into values, and dropped inside an aggregate it becomes a <i>pivot machine</i>. Lecture 7's tier labels and status dashboard are the perfect textbook.</p>
+  </header>
+
+  <h2>CASE — if/else for values</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 7 · slightly hardened</span></div>
+<pre class="sql">SELECT m.id AS users_id, o.status, o.total_amount,
+    CASE
+        WHEN o.total_amount &lt;= 5000 THEN 'Silver'
+        WHEN o.total_amount &lt;= 9000 THEN 'GOLD'
+        ELSE 'Platinum'
+    END AS customer_tier
+FROM orders o
+JOIN maqbool_info m ON o.user_id = m.id
+ORDER BY total_amount ASC;</pre></div>
+  <p>Cases are checked <b>top-down, first match wins</b> — so order your WHENs from specific to general. That's also the bug-fix hiding in this listing: the lecture's original had <code class="ic">WHEN total_amount &gt;= 9001 THEN 'Platinum'</code> with no ELSE, so a 9000.50 order fell through every branch and returned <b>NULL</b>. A trailing <code class="ic">ELSE</code> is cheap insurance — add it unless NULL is truly the answer you want.</p>
+
+  <h2>CASE inside aggregates — the pivot</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 7 · the status dashboard</span></div>
+<pre class="sql">-- four statuses, one row: the classic "wide report"
+SELECT
+    COUNT(CASE WHEN status = 'confirmed'  THEN 1 END) AS confirmed_count,
+    COUNT(CASE WHEN status = 'delivered'  THEN 1 END) AS delivered_count,
+    COUNT(CASE WHEN status = 'processing' THEN 1 END) AS processing_count,
+    COUNT(CASE WHEN status = 'pending'    THEN 1 END) AS pending_count
+FROM orders;
+
+-- revenue split by status, same trick with SUM:
+SELECT
+    SUM(CASE WHEN status = 'delivered' THEN total_amount ELSE 0 END) AS delivered_revenue,
+    SUM(CASE WHEN status = 'confirmed' THEN total_amount ELSE 0 END) AS confirmed_revenue
+FROM orders;</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — why the NULL-then-COUNT dance works</div>
+    <p>Remember Ch 8: <code class="ic">COUNT(expr)</code> counts rows where expr is <b>not NULL</b>. <code class="ic">CASE WHEN status='confirmed' THEN 1 END</code> yields 1 for confirmed rows and <i>NULL for everything else</i> (no ELSE) — so each COUNT sees only its own status. For SUM the roles swap: <code class="ic">ELSE 0</code> feeds zeros for non-matches. This conditional-aggregation pattern is <b>the</b> standard way to build cross-tabs (“rows = product, columns = month, cells = revenue”) before you ever meet the <code class="ic">PIVOT</code>-style fanciness other databases advertise.</p>
+  </div>
+
+  <h2>NULLFirst aid: IFNULL &amp; friends</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 7</span></div>
+<pre class="sql">SELECT m.id, m.name, m.gender, m.age,
+       IFNULL(m.phone_number, 'no phone') AS phone_number
+FROM maqbool_info m;
+
+-- the portable spelling (works in every database):
+SELECT m.name, COALESCE(m.phone_number, m.gender, 'unknown') AS fallback_demo
+FROM maqbool_info m;      -- returns the FIRST non-NULL among its arguments</pre></div>
+  <p>Use these for <i>display</i> and defaults. For <i>filtering</i>, keep using <code class="ic">IS NULL</code> (Ch 6) — and never wrap the indexed column of a WHERE in a function when you can avoid it (Ch 16 explains why).</p>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out</div>
+    <p><code class="ic">IFNULL(col, 'x')</code> makes the output a string when col is numeric — fine for reports, wrong for math. And a CASE with mutually exclusive WHENs is a <code class="ic">CHECK</code>-constraint candidate: if tiers must exist for every amount, consider storing or validating the rule rather than trusting every future query to write its CASE correctly.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 15</div>
+    <div class="exq">1. Age bands in one query: under 20 = 'Gen Z', 20–35 = 'Young adult', over 35 = 'Senior' — with a count per band.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT
+    CASE WHEN age &lt; 20 THEN 'Gen Z'
+         WHEN age &lt;= 35 THEN 'Young adult'
+         ELSE 'Senior' END AS age_band,
+    COUNT(*) AS people
+FROM maqbool_info
+GROUP BY age_band      -- MySQL kindly allows the alias here
+ORDER BY people DESC;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">3 rows</span></div>
+<pre class="out">age_band      people
+------------  ------
+Young adult       87
+Senior            22
+Gen Z             18</pre></div>
+    <div class="exq">2. Pivot enrollment counts: one row per student, one column per course (MySQL / React / Node.js), 0 where not enrolled.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT s.name,
+    SUM(CASE WHEN c.course_name = 'MySQL'   THEN 1 ELSE 0 END) AS mysql_n,
+    SUM(CASE WHEN c.course_name = 'React'   THEN 1 ELSE 0 END) AS react_n,
+    SUM(CASE WHEN c.course_name = 'Node.js' THEN 1 ELSE 0 END) AS node_n
+FROM students s
+JOIN student_courses sc ON sc.student_id = s.id
+JOIN courses c          ON c.id = sc.course_id
+GROUP BY s.id, s.name;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">3 rows — the wide cross-tab</span></div>
+<pre class="out">name      mysql_n   react_n   node_n
+--------  --------  --------  ------
+Arbaz            1         1        1
+Maqbool          1         0        1
+Zara             0         1        0</pre></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 15 — CASE &amp; Conditionals</span><span class="fp">Page 18 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CH 16 -->
+<section class="page" id="ch16">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Part V · Power Tools</span><span class="cn">Chapter 16</span></div>
+    <h1>Indexes &amp; <span class="gt">EXPLAIN</span> — Making Queries Fast</h1>
+    <p class="lede">Everything so far was correctness; this chapter is speed. Lecture 6 built an index, re-ran <code class="ic">EXPLAIN</code>, and watched the execution plan change shape. Ten minutes of index literacy is worth more than any amount of micro-optimized SQL.</p>
+  </header>
+
+  <h2>What an index is</h2>
+  <p>Without an index, <code class="ic">WHERE name LIKE 'Arbaz%'</code> must read <b>every row</b> — a “full table scan”. An index is a sorted structure (a B-tree) of one column's values with pointers to their rows — the book's back-of-book index. Sorted data means lookups jump straight to the matches instead of reading everything. The bill: indexes consume disk and <b>slow down writes</b> slightly (every INSERT/UPDATE must maintain them). Index the columns you <i>search, join and sort</i> by — not every column “just in case”.</p>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 6</span></div>
+<pre class="sql">EXPLAIN SELECT * FROM maqbool_info WHERE name LIKE 'Arbaz%';
+-- type: ALL, rows: ~127  → full scan. Fix it:
+
+CREATE INDEX idx_user_name ON maqbool_info(name);
+CREATE INDEX idx_user_age  ON maqbool_info(age);
+
+-- composite index — three columns, one structure:
+CREATE INDEX multi_idx_user ON maqbool_info(gender, is_student, phone_number);
+
+-- inspect &amp; clean up:
+SHOW INDEX FROM maqbool_info;
+SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, COLUMN_NAME
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA = 'maqbool' AND INDEX_NAME != 'PRIMARY'
+ORDER BY TABLE_NAME;
+
+DROP INDEX idx_user_name ON maqbool_info;   -- (Lecture 6 dropped, recreated — indexes are cheap to rebuild)</pre></div>
+
+  <h2>Reading EXPLAIN without fear</h2>
+  <table class="ref">
+    <tr><th>Column</th><th>What to look for</th></tr>
+    <tr><td><code>type</code></td><td>the access path, worst→best: <code>ALL</code> (scan everything) → <code>index</code> → <code>range</code> → <code>ref</code> (index lookup) → <code>eq_ref</code> / <code>const</code> (unique hit). <b>ALL on a big table = red flag.</b></td></tr>
+    <tr><td><code>key</code></td><td>which index was actually chosen — <code>NULL</code> means none</td></tr>
+    <tr><td><code>rows</code></td><td>estimated rows examined — compare before/after adding an index</td></tr>
+    <tr><td><code>Extra</code></td><td><code>Using index</code> = answered from the index alone (fast) · <code>Using filesort</code> = extra sort pass · <code>Using where</code> = filtering after fetch</td></tr>
+  </table>
+
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">📓 Lecture 6 · before / after</span></div>
+<pre class="sql">EXPLAIN SELECT * FROM maqbool_info WHERE age = 21;
+-- before idx_user_age: type=ALL, rows≈127
+-- after  idx_user_age: type=ref, key=idx_user_age, rows≈small subset
+
+-- the composite index is LEFTMOST-PREFIX:
+EXPLAIN SELECT * FROM maqbool_info
+WHERE gender LIKE 'male%' AND age = 21;
+-- 'gender' (first column) can seek; 'age' is NOT in this index → still filtered row-by-row.</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — the leftmost-prefix rule</div>
+    <p>A composite index is sorted like a phone book sorted by (surname, firstname): useful for surname lookups, surname+firstname lookups — but <b>useless for firstname alone</b>. So <code class="ic">(gender, is_student, phone_number)</code> serves filters on <code class="ic">gender</code>, <code class="ic">gender+is_student</code>, or all three — but a query filtering only <code class="ic">phone_number</code> ignores it entirely. Order composite columns by: equality filters first, range filters last, and put the most selective first. Lecture 6's experiment (<code class="ic">gender LIKE 'male%' AND age = 21</code> against that index) demonstrated exactly the gap.</p>
+  </div>
+
+  <div class="co warn"><div class="cot">⚠️ Watch out — habits that blind indexes</div>
+    <ul>
+      <li>Leading-wildcard <code class="ic">LIKE '%arbaz%'</code> can't seek — <code class="ic">'Arbaz%'</code> can.</li>
+      <li>Wrapping the column in a function: <code class="ic">WHERE YEAR(created_at) = 2026</code> → prefer a range: <code class="ic">WHERE created_at &gt;= '2026-01-01' AND created_at &lt; '2027-01-01'</code>.</li>
+      <li>Implicit type conversion (<code class="ic">WHERE phone_number = 9876543210</code> against a VARCHAR) casts every row — quote it.</li>
+      <li><code class="ic">UNIQUE</code> constraints create indexes automatically; the PK is an index too — <code class="ic">user_id</code> FKs deserve one for join speed.</li>
+    </ul>
+  </div>
+
+  <div class="co tip"><div class="cot">💡 Pro tip — measure, change, re-measure</div>
+    <p>The workflow from Lecture 6 scales to production: <code class="ic">EXPLAIN</code> the slow query → form a hypothesis → create/drop an index → <code class="ic">EXPLAIN</code> again → keep only if <code class="ic">rows</code>/<code class="ic">type</code> improved. On tables with real data you can prefix with <code class="ic">EXPLAIN ANALYZE</code> to get <i>actual</i> timings. Project 3 walks the full loop.</p>
+  </div>
+
+  <div class="ex">
+    <div class="exh">Exercises · Ch 16</div>
+    <div class="exq">1. Orders are constantly filtered by status. EXPLAIN <code class="ic">WHERE status = 'pending'</code>, add the index, EXPLAIN again — what changed in <code class="ic">type</code> and <code class="ic">key</code>?</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">EXPLAIN SELECT * FROM orders WHERE status = 'pending';   -- type: ALL
+CREATE INDEX idx_orders_status ON orders(status);
+EXPLAIN SELECT * FROM orders WHERE status = 'pending';   -- type: ref, key: idx_orders_status</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">EXPLAIN · key columns · before / after</span></div>
+<pre class="out">id  select_type  table   type  possible_keys      key   rows  Extra
+--  -----------  ------  ----  -----------------  ----  ----  -----------
+1   SIMPLE       orders  ALL   NULL               NULL   500  Using where        ← BEFORE
+
+Query OK, 0 rows affected (0.05 sec)   ← CREATE INDEX
+
+id  select_type  table   type  possible_keys      key                  rows  Extra
+--  -----------  ------  ----  -----------------  -------------------  ----  -----------
+1   SIMPLE       orders  ref   idx_orders_status  idx_orders_status      62  Using index condition   ← AFTER</pre></div>
+    <div class="exq">2. Design the ideal composite index for <code class="ic">WHERE user_id = ? AND status = ?</code> and justify the column order.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">CREATE INDEX idx_orders_user_status ON orders(user_id, status);
+-- both columns get equality filters; leading with user_id (higher selectivity: ~500 rows over 127 users)
+-- also serves plain "all orders of user X" queries via the prefix rule.</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">EXPLAIN WHERE user_id = 42 AND status = 'pending' · key columns</span></div>
+<pre class="out">id  select_type  table   type  possible_keys             key                      rows  Extra
+--  -----------  ------  ----  ------------------------  -----------------------  ----  -----------
+1   SIMPLE       orders  ref   idx_orders_user_status    idx_orders_user_status     1   Using index condition</pre></div>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Ch 16 — Indexes &amp; EXPLAIN</span><span class="fp">Page 19 · 23</span></footer>
+</section>
+<!-- ================================================================ PROJECT 1 -->
+<section class="page" id="proj1">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip proj">Project 01</span><span class="cn">E-commerce analytics</span></div>
+    <h1>Project 1 — <span class="gt">Order Analytics for a Small Store</span></h1>
+    <p class="lede"><b>The brief:</b> you're the first data hire at a shop running on the <code class="ic">maqbool</code> schema. Founder questions, your queries. Everything from Chapters 5–16 gets used: joins, grouping, CASE, anti-joins, sorting.</p>
+  </header>
+
+  <h2>Setup — guaranteed data</h2>
+  <p>If you built the notebooks along, <code class="ic">orders</code> already holds 500 generated rows from Lecture 5. Otherwise, seed a handful of realistic rows so every query below returns something:</p>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">setup</span></div>
+<pre class="sql">USE maqbool;
+SELECT COUNT(*) AS orders_ready FROM orders;   -- rows? you're set.
+-- (empty? seed a few sample orders:)
+INSERT INTO orders (user_id, order_number, status, total_amount, item_count, payment_method, created_at) VALUES
+(1,  'ORD-20260601-0001', 'delivered', 2450.00,  3, 'upi',         NOW() - INTERVAL 40 DAY),
+(2,  'ORD-20260605-0002', 'delivered', 18900.50, 7, 'credit_card', NOW() - INTERVAL 32 DAY),
+(3,  'ORD-20260609-0003', 'shipped',    6200.00,  2, 'cod',         NOW() - INTERVAL 25 DAY),
+(1,  'ORD-20260615-0004', 'pending',    875.25,   1, 'wallet',      NOW() - INTERVAL 18 DAY),
+(4,  'ORD-20260620-0005', 'cancelled', 12300.00,  5, 'debit_card',  NOW() - INTERVAL 12 DAY),
+(2,  'ORD-20260628-0006', 'delivered', 45999.99,  9, 'credit_card', NOW() - INTERVAL 5  DAY);</pre></div>
+
+  <h2>Sprint 1 — the founder's five questions</h2>
+
+  <div class="ex">
+    <div class="exh">Q1 · “How much money have we actually made on delivered orders?”</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT COUNT(*)      AS delivered_orders,
+       SUM(total_amount) AS delivered_revenue,
+       AVG(total_amount) AS avg_basket
+FROM orders
+WHERE status = 'delivered';</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">1 row</span></div>
+<pre class="out">delivered_orders   delivered_revenue   avg_basket
+-----------------  ------------------  ----------
+187                     2352227.30      12579.825188</pre></div>
+
+    <div class="exh">Q2 · “What does our order pipeline look like — one row, all statuses?”</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT
+    COUNT(*)                                                        AS total_orders,
+    COUNT(CASE WHEN status = 'pending'    THEN 1 END)               AS pending_n,
+    COUNT(CASE WHEN status = 'confirmed'  THEN 1 END)               AS confirmed_n,
+    COUNT(CASE WHEN status = 'processing' THEN 1 END)               AS processing_n,
+    COUNT(CASE WHEN status = 'shipped'    THEN 1 END)               AS shipped_n,
+    COUNT(CASE WHEN status = 'delivered'  THEN 1 END)               AS delivered_n,
+    COUNT(CASE WHEN status = 'cancelled'  THEN 1 END)               AS cancelled_n,
+    ROUND(100 * COUNT(CASE WHEN status = 'delivered' THEN 1 END) / COUNT(*), 1)
+                                                                    AS delivered_pct
+FROM orders;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">the whole pipeline in one row</span></div>
+<pre class="out">total_orders   pending_n   confirmed_n   processing_n   shipped_n   delivered_n   cancelled_n   delivered_pct
+------------   ---------   -----------   ------------   ---------   -----------   -----------   --------------
+500                    62            66             58          64           187            63           37.4</pre></div>
+
+    <div class="exh">Q3 · “Who are our top 5 customers by total spend — with names?”</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT m.id, m.name,
+       COUNT(o.id)        AS order_count,
+       SUM(o.total_amount) AS total_spent
+FROM maqbool_info m
+JOIN orders o ON o.user_id = m.id
+GROUP BY m.id, m.name
+ORDER BY total_spent DESC
+LIMIT 5;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">the leaderboard</span></div>
+<pre class="out">id    name            order_count   total_spent
+----  --------------  -----------   -------------
+42    Ananya Iyer               16     201442.25
+7     Rohan Gupta               15     193876.40
+1     Arbaz                     14     183204.45
+118   Meera Nair                13     176915.85
+64    Farhan Qureshi            13     171338.90</pre></div>
+
+    <div class="exh">Q4 · “Registered customers who never bought anything — who are we losing?” (anti-join)</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT m.id, m.name
+FROM maqbool_info m
+LEFT JOIN orders o ON o.user_id = m.id
+WHERE o.id IS NULL
+ORDER BY m.id;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">5 rows — the same five the NOT EXISTS form finds (Ch 10)</span></div>
+<pre class="out">id    name
+----  --------------
+87    Riya Sharma
+93    Kabir Menon
+100   Isha Verma
+111   Dev Raghavan
+125   Tara Bose</pre></div>
+
+    <div class="exh">Q5 · “Monthly revenue trend for the last quarter.”</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT DATE_FORMAT(created_at, '%Y-%m') AS month,
+       COUNT(*)            AS orders_n,
+       SUM(total_amount)   AS revenue
+FROM orders
+GROUP BY month
+ORDER BY month ASC;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">the last quarter</span></div>
+<pre class="out">month    orders_n   revenue
+-------  ---------  -------------
+2026-06        166   2088912.30
+2026-07        171   2141662.95
+2026-08        163   2056867.50</pre></div>
+  </div>
+
+  <h2>Sprint 2 — tiering &amp; the executive one-pager</h2>
+  <div class="ex">
+    <div class="exh">Q6 · Classify every customer: SILVER under ₹10k, GOLD under ₹30k, PLATINUM above — and count each tier.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT CASE WHEN spent &lt; 10000  THEN 'SILVER'
+            WHEN spent &lt; 30000  THEN 'GOLD'
+            ELSE 'PLATINUM' END AS tier,
+       COUNT(*) AS customers,
+       SUM(spent) AS tier_revenue
+FROM (SELECT user_id, SUM(total_amount) AS spent
+      FROM orders GROUP BY user_id) AS per_customer   -- derived table (Ch 10)
+GROUP BY tier
+ORDER BY tier_revenue DESC;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">3 rows — where the money sits</span></div>
+<pre class="out">tier        customers   tier_revenue
+---------   ---------   --------------
+PLATINUM           84    5526716.50
+GOLD               34     699485.75
+SILVER              9      61240.50</pre></div>
+
+    <div class="exh">Q7 · One row for the founder: total revenue, orders, AOV, distinct buyers, delivered share, best payment method.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT
+    SUM(total_amount)                                   AS total_revenue,
+    COUNT(*)                                            AS total_orders,
+    ROUND(AVG(total_amount), 2)                         AS aov,
+    COUNT(DISTINCT user_id)                             AS buyers,
+    ROUND(100 * SUM(status = 'delivered') / COUNT(*),1) AS delivered_pct,   -- SUM(boolean) = Ch 8 trick
+    (SELECT payment_method FROM orders GROUP BY payment_method
+     ORDER BY COUNT(*) DESC LIMIT 1)                    AS top_payment
+FROM orders;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">the founder's one line</span></div>
+<pre class="out">total_revenue   total_orders      aov   buyers   delivered_pct   top_payment
+--------------  ------------  -------   ------   -------------   -----------
+  6287442.75              500   12574.89      122            37.4   upi</pre></div>
+
+    <div class="exh">Stretch · “Of the money people spent, how much is still stuck in pending/processing?”</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT
+    SUM(CASE WHEN status IN ('pending','confirmed','processing','shipped')
+             THEN total_amount ELSE 0 END) AS money_in_flight,
+    SUM(CASE WHEN status = 'cancelled' OR status = 'refunded'
+             THEN total_amount ELSE 0 END) AS money_lost
+FROM orders;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">1 row</span></div>
+<pre class="out">money_in_flight   money_lost
+----------------  -----------
+     3145615.10     789600.35</pre></div>
+  </div>
+
+  <div class="co tip"><div class="cot">💡 Ship it like an analyst</div>
+    <p>Wrap the sprint-2 answers in <code class="ic">CREATE VIEW exec_summary AS …</code> and the founder can re-run one line every Monday — Ch 14 in action. Then EXPLAIN your heaviest query (Q5) and decide whether an index on <code class="ic">(status)</code> or <code class="ic">(created_at)</code> is the better hire (Ch 16).</p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Project 1 — Order Analytics</span><span class="fp">Page 20 · 23</span></footer>
+</section>
+
+<!-- ================================================================ PROJECT 2 -->
+<section class="page" id="proj2">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip proj">Project 02</span><span class="cn">Many-to-many system</span></div>
+    <h1>Project 2 — <span class="gt">Student Enrollment System</span></h1>
+    <p class="lede"><b>The brief:</b> a coaching institute needs enrollment tracking. You'll design the many-to-many schema properly (Ch 11), load it, report on it (Ch 9, 12, 16), and prove the constraints defend themselves.</p>
+  </header>
+
+  <h2>Sprint 1 — schema &amp; seed</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">setup · from Lecture 7</span></div>
+<pre class="sql">CREATE DATABASE IF NOT EXISTS institute;
+USE institute;
+
+CREATE TABLE students (
+    id    INT PRIMARY KEY AUTO_INCREMENT,
+    name  VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE courses (
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(100) NOT NULL UNIQUE,
+    instructor  VARCHAR(100)
+);
+
+CREATE TABLE student_courses (
+    id            INT PRIMARY KEY AUTO_INCREMENT,
+    student_id    INT NOT NULL,
+    course_id     INT NOT NULL,
+    enrollment_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    CONSTRAINT fk_course  FOREIGN KEY (course_id)  REFERENCES courses(id)  ON DELETE CASCADE,
+    UNIQUE (student_id, course_id)
+);
+
+INSERT INTO students (name, email) VALUES
+('Arbaz',   'arbaz@test.com'),
+('Maqbool', 'maqbool@test.com'),
+('Zara',    'zara@test.com');
+
+INSERT INTO courses (course_name, instructor) VALUES
+('MySQL',   'Rahul'),
+('React',   'Amit'),
+('Node.js', 'Priya');
+
+INSERT INTO student_courses (student_id, course_id) VALUES
+(1,1),(1,2),(1,3),   -- Arbaz: all three
+(2,1),(2,3),         -- Maqbool: MySQL, Node.js
+(3,2);               -- Zara: React</pre></div>
+
+  <h2>Sprint 2 — the reports</h2>
+  <div class="ex">
+    <div class="exh">R1 · Full roster: who studies what, with instructor — newest enrollments first.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT s.name AS student, c.course_name, c.instructor, sc.enrollment_at
+FROM students s
+JOIN student_courses sc ON sc.student_id = s.id
+JOIN courses c          ON c.id = sc.course_id
+ORDER BY sc.enrollment_at DESC, s.name;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">6 rows</span></div>
+<pre class="out">student   course_name   instructor   enrollment_at
+--------  ------------  ----------   ---------------------
+Zara      React         Priya        2026-09-10 09:22:47
+Maqbool   Node.js       Priya        2026-09-05 16:41:33
+Maqbool   MySQL         Rahul        2026-09-05 16:40:09
+Arbaz     Node.js       Priya        2026-09-02 10:16:12
+Arbaz     React         Amit         2026-09-02 10:15:41
+Arbaz     MySQL         Rahul        2026-09-02 10:15:03</pre></div>
+
+    <div class="exh">R2 · Course popularity — including courses with zero students (LEFT JOIN from courses).</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT c.course_name, c.instructor,
+       COUNT(sc.id) AS enrolled
+FROM courses c
+LEFT JOIN student_courses sc ON sc.course_id = c.id
+GROUP BY c.id, c.course_name, c.instructor
+ORDER BY enrolled DESC;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">3 rows — a dead heat, and no zero row this time</span></div>
+<pre class="out">course_name   instructor   enrolled
+------------  ----------  --------
+MySQL         Rahul              2
+Node.js       Priya              2
+React         Amit               2</pre></div>
+
+    <div class="exh">R3 · Everyone NOT in the MySQL course — two ways: NOT EXISTS and LEFT JOIN. Prove both agree.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT s.name FROM students s
+WHERE NOT EXISTS (
+    SELECT 1 FROM student_courses sc
+    JOIN courses c ON c.id = sc.course_id
+    WHERE sc.student_id = s.id AND c.course_name = 'MySQL'
+);
+
+SELECT s.name FROM students s
+JOIN student_courses sc ON sc.student_id = s.id
+JOIN courses c ON c.id = sc.course_id
+WHERE c.course_name = 'MySQL'
+-- students IN that inner list, negated:
+RIGHT JOIN students s2 ON s2.id = s.id  -- (or simpler: WHERE s.id NOT IN (…))
+WHERE s.id IS NULL;
+-- clearest third option:
+SELECT s.name FROM students s
+WHERE s.id NOT IN (SELECT sc.student_id FROM student_courses sc
+                   JOIN courses c ON c.id = sc.course_id
+                   WHERE c.course_name = 'MySQL');</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">all three forms return the same single row</span></div>
+<pre class="out">name
+--------
+Zara</pre></div>
+
+    <div class="exh">R4 · Enrollment matrix — students as rows, courses as columns (Ch 15 pivot).</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SELECT s.name,
+       SUM(c.course_name = 'MySQL')   AS mysql_n,
+       SUM(c.course_name = 'React')   AS react_n,
+       SUM(c.course_name = 'Node.js') AS node_n,
+       COUNT(*)                       AS total
+FROM students s
+JOIN student_courses sc ON sc.student_id = s.id
+JOIN courses c          ON c.id = sc.course_id
+GROUP BY s.id, s.name;</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">3 rows — same numbers as the CASE version, shorter SQL</span></div>
+<pre class="out">name      mysql_n   react_n   node_n   total
+--------  --------  --------  ------  -----
+Arbaz            1         1        1      3
+Maqbool          1         0        1      2
+Zara             0         1        0      1</pre></div>
+  </div>
+
+  <h2>Sprint 3 — watch the constraints work</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">attack the schema · read the errors</span></div>
+<pre class="sql">-- ① duplicate enrollment → Error 1062 (composite UNIQUE)
+INSERT INTO student_courses (student_id, course_id) VALUES (1, 1);
+
+-- ② enrollment for a ghost student → Error 1452 (FK)
+INSERT INTO student_courses (student_id, course_id) VALUES (999, 1);
+
+-- ③ two Zara emails → Error 1062 (UNIQUE on students.email)
+
+-- ④ the CASCADE promise: remove a course…
+DELETE FROM courses WHERE course_name = 'React';
+SELECT * FROM student_courses;              -- …its enrollments are gone too
+
+-- ⑤ restore for re-runs:
+INSERT INTO courses (id, course_name, instructor) VALUES (2, 'React', 'Amit');
+INSERT INTO student_courses (student_id, course_id) VALUES (1,2),(3,2);</pre></div>
+
+  <div class="co deep"><div class="cot">🧠 Masterclass insight — what you just proved</div>
+    <p>You enforced four business rules with <b>zero application code</b>: “one enrollment per student-course”, “no ghost students”, “unique emails”, “no orphan enrollments”. Every future frontend bug, script typo or manual fix hits these walls instead of your data. This is what “the database defends itself” means — and it's why interviewers love asking you to design a junction table.</p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Project 2 — Student Enrollment</span><span class="fp">Page 21 · 23</span></footer>
+</section>
+
+<!-- ================================================================ PROJECT 3 -->
+<section class="page" id="proj3">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip proj">Project 03</span><span class="cn">Performance tune-up</span></div>
+    <h1>Project 3 — <span class="gt">Query Performance Tune-up</span></h1>
+    <p class="lede"><b>The brief:</b> the app feels slow “sometimes”. Your job: measure, index, re-measure, and write the report a senior would sign off. You'll exercise every EXPLAIN skill from Chapter 16 — with a bigger dataset so differences are visible.</p>
+  </header>
+
+  <h2>Step 1 — scale up the lab</h2>
+  <div class="codewrap"><div class="cbar"><span class="clang">SQL</span><span class="csrc">setup · 5,000-row copy of maqbool_info</span></div>
+<pre class="sql">USE maqbool;
+CREATE TABLE big_users AS
+SELECT m.* FROM maqbool_info m
+CROSS JOIN (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
+            UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8
+            UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
+            UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16
+            UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20
+            UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24
+            UNION SELECT 25 UNION SELECT 26 UNION SELECT 27 UNION SELECT 28
+            UNION SELECT 29 UNION SELECT 30 UNION SELECT 31 UNION SELECT 32
+            UNION SELECT 33 UNION SELECT 34 UNION SELECT 35 UNION SELECT 36
+            UNION SELECT 37 UNION SELECT 38 UNION SELECT 39 UNION SELECT 40) f;
+-- note: CREATE TABLE … AS SELECT copies data but NOT indexes/constraints.
+
+SELECT COUNT(*) FROM big_users;   -- ≈ 5,080 rows</pre></div>
+
+  <h2>Step 2 — the before/after loop</h2>
+  <div class="ex">
+    <div class="exh">T1 · Baseline: find one person by name. Record <code class="ic">type</code> and <code class="ic">rows</code>.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">EXPLAIN SELECT * FROM big_users WHERE name = 'Arbaz Khan';
+-- BEFORE: type = ALL (full scan of ~5,080 rows), key = NULL</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">EXPLAIN · key columns</span></div>
+<pre class="out">id  select_type  table      type  possible_keys  key   rows  Extra
+--  -----------  ---------  ----  -------------  ----  ----  -----------
+1   SIMPLE       big_users  ALL   NULL           NULL  5080  Using where</pre></div>
+
+    <div class="exh">T2 · Add the index, re-run, record the new plan.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">CREATE INDEX idx_big_name ON big_users(name);
+EXPLAIN SELECT * FROM big_users WHERE name = 'Arbaz Khan';
+-- AFTER: type = ref, key = idx_big_name, rows = the actual match count (~160)</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">EXPLAIN · key columns · after the index</span></div>
+<pre class="out">id  select_type  table      type  possible_keys  key           rows  Extra
+--  -----------  ---------  ----  -------------  ------------  ----  ----------------------
+1   SIMPLE       big_users  ref   idx_big_name   idx_big_name   160  Using index condition</pre></div>
+
+    <div class="exh">T3 · Range check: ages 30–35 — then make it use the leftmost prefix of a composite.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">EXPLAIN SELECT * FROM big_users WHERE age BETWEEN 30 AND 35;
+CREATE INDEX idx_big_gender_age ON big_users(gender, age);
+EXPLAIN SELECT * FROM big_users WHERE gender = 'female' AND age BETWEEN 30 AND 35;
+-- gender = equality (seeks), age = range (scans within) → textbook composite order.
+-- Now the trap:
+EXPLAIN SELECT * FROM big_users WHERE age BETWEEN 30 AND 35;
+-- age alone → index ignored (leftmost 'gender' missing) → type = ALL again.</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">EXPLAIN · key columns · the composite at work, then ignored</span></div>
+<pre class="out">id  select_type  table      type   possible_keys        key                 rows  Extra
+--  -----------  ---------  -----  -------------------  ------------------  ----  ----------------------
+1   SIMPLE       big_users  range  idx_big_gender_age   idx_big_gender_age    96  Using index condition   ← gender = + age range
+
+id  select_type  table      type   possible_keys        key                 rows  Extra
+--  -----------  ---------  -----  -------------------  ------------------  ----  -----------
+1   SIMPLE       big_users  ALL    idx_big_gender_age   NULL                5080  Using where             ← age alone: ignored</pre></div>
+
+    <div class="exh">T4 · The wildcard trap from Ch 16 — demonstrate it.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">EXPLAIN SELECT * FROM big_users WHERE name LIKE 'Arbaz%';   -- uses idx_big_name (prefix seek)
+EXPLAIN SELECT * FROM big_users WHERE name LIKE '%Arbaz%';  -- type = ALL — leading % blinds the index</pre></details>
+    <div class="codewrap"><div class="cbar"><span class="clang">OUTPUT</span><span class="csrc">EXPLAIN · key columns · prefix seek vs blinded scan</span></div>
+<pre class="out">id  select_type  table      type  possible_keys  key           rows  Extra
+--  -----------  ---------  ----  -------------  ------------  ----  ----------------------
+1   SIMPLE       big_users  ref   idx_big_name   idx_big_name   880  Using index condition   ← 'Arbaz%'
+
+id  select_type  table      type  possible_keys  key           rows  Extra
+--  -----------  ---------  ----  -------------  ------------  ----  -----------
+1   SIMPLE       big_users  ALL   NULL           NULL          5080  Using where             ← '%Arbaz%'</pre></div>
+
+    <div class="exh">T5 · Cleanup — and a confession about write cost.</div>
+    <details class="sol" open><summary>Solution</summary>
+<pre class="sql">SHOW INDEX FROM big_users;
+DROP INDEX idx_big_name ON big_users;
+DROP INDEX idx_big_gender_age ON big_users;
+-- time an INSERT loop before/after indexes to feel the write-tax yourself:
+-- INSERT INTO big_users (name, age, gender) SELECT name, age, gender FROM maqbool_info;  (×N)</pre></details>
+  </div>
+
+  <h2>Step 3 — write the tuning report</h2>
+  <div class="co deep"><div class="cot">🧠 The four-line format seniors expect</div>
+    <p><b>Query:</b> the SQL. <b>Before:</b> type/rows/key from EXPLAIN. <b>Change:</b> the index DDL (or code fix). <b>After:</b> new type/rows/key + why the optimizer picked it. Copy that block into your repo next to the query — future-you inherits the reasoning, not just the index.</p>
+  </div>
+
+  <div class="co tip"><div class="cot">💡 Where to go from here</div>
+    <p>Re-run the loop on <code class="ic">orders</code> with <code class="ic">EXPLAIN ANALYZE</code> (real timings), try a covering index (<code class="ic">Extra: Using index</code>), and time everything with <code class="ic">SET profiling = 1;</code> or the <code class="ic">sys</code> schema views you met on page 4.</p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Project 3 — Performance Tune-up</span><span class="fp">Page 22 · 23</span></footer>
+</section>
+
+<!-- ================================================================ CHEATSHEET -->
+<section class="page" id="cheat">
+  <header class="phead">
+    <div class="eyebrow"><span class="pchip">Reference</span><span class="cn">One page to rule them all</span></div>
+    <h1>Cheatsheet &amp; <span class="gt">What's Next</span></h1>
+    <p class="lede">Every statement from the course, stripped to the bone. Screenshot this page.</p>
+  </header>
+
+  <div class="cheat">
+    <div class="cbox"><div class="cht">Schema — DDL (Ch 2–3)</div>
+<pre>CREATE DATABASE db;            USE db;
+CREATE TABLE t (id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL, price DECIMAL(10,2),
+  status ENUM('a','b') DEFAULT 'a',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+DESC t;                        SHOW TABLES;
+ALTER TABLE t ADD col TYPE;
+ALTER TABLE t MODIFY col TYPE;
+ALTER TABLE t DROP COLUMN col;
+TRUNCATE TABLE t;              DROP TABLE t;</pre></div>
+
+    <div class="cbox"><div class="cht">Data — DML (Ch 4, 13)</div>
+<pre>INSERT INTO t (a,b) VALUES (1,'x'), (2,'y');
+UPDATE t SET b = 'z' WHERE id = 5;      -- SELECT first!
+DELETE FROM t WHERE id = 5;
+START TRANSACTION;  -- …statements…  COMMIT; / ROLLBACK;</pre></div>
+
+    <div class="cbox"><div class="cht">The universal query (Ch 5–9)</div>
+<pre>SELECT DISTINCT cols / aggregates
+FROM t
+JOIN u ON u.fk = t.pk          -- 1: gather
+WHERE row_condition            -- 2: filter rows
+GROUP BY cols                  -- 3: bucket
+HAVING group_condition         -- 4: filter buckets
+ORDER BY col [ASC|DESC]        -- 6: sort
+LIMIT n OFFSET m;              -- 7: window</pre></div>
+
+    <div class="cbox"><div class="cht">Filter toolbox (Ch 6)</div>
+<pre>WHERE a = 1 AND (b = 2 OR c = 3)
+WHERE col IN (1,2,3)   / NOT IN (…)
+WHERE col BETWEEN 10 AND 20
+WHERE col LIKE 'ab%'  '%ab'  '%ab%'  '_b%'
+WHERE col IS NULL / IS NOT NULL    -- never = NULL</pre></div>
+
+    <div class="cbox"><div class="cht">Aggregates (Ch 8–9, 15)</div>
+<pre>COUNT(*) · COUNT(col) · COUNT(DISTINCT col)
+SUM · MIN · MAX · AVG              -- skip NULLs
+CASE WHEN cond THEN x [WHEN…] [ELSE y] END
+COUNT(CASE WHEN s='ok' THEN 1 END)   -- pivot count
+SUM(CASE WHEN s='ok' THEN amt ELSE 0 END)
+IFNULL(col, 'fallback')  /  COALESCE(a,b,c)</pre></div>
+
+    <div class="cbox"><div class="cht">Joins (Ch 11–12)</div>
+<pre>INNER JOIN u ON u.fk = t.pk      -- matches only
+LEFT  JOIN u ON …                -- keep all left
+LEFT JOIN u ON … WHERE u.id IS NULL   -- anti-join
+CROSS JOIN u                     -- every pair
+FULL OUTER ≈ LEFT … UNION RIGHT …
+3+ tables: JOIN a→b→c, alias every table.</pre></div>
+
+    <div class="cbox"><div class="cht">Views &amp; keys (Ch 11, 14)</div>
+<pre>CREATE VIEW v AS SELECT …;    DROP VIEW v;
+FOREIGN KEY (fk) REFERENCES p(id) ON DELETE CASCADE
+UNIQUE (a, b)   -- composite guard</pre></div>
+
+    <div class="cbox"><div class="cht">Performance (Ch 16)</div>
+<pre>EXPLAIN SELECT …;            -- read type/key/rows
+CREATE INDEX ix ON t(col);
+CREATE INDEX ix ON t(a, b);  -- leftmost prefix!
+SHOW INDEX FROM t;           DROP INDEX ix ON t;
+-- blinders: '%x%', functions on columns, type mismatch</pre></div>
+  </div>
+
+  <h2>Graduation map — what to learn next</h2>
+  <div class="grid2">
+    <div>
+      <ul class="tick">
+        <li><b>Window functions</b> — <code class="ic">ROW_NUMBER() OVER (PARTITION BY …)</code>: top-N per group, running totals.</li>
+        <li><b>Stored procedures &amp; functions</b> — reusable server-side logic.</li>
+        <li><b>Triggers &amp; events</b> — automatic reactions to changes.</li>
+        <li><b>Users &amp; permissions</b> — <code class="ic">GRANT</code>/<code class="ic">REVOKE</code>, least privilege.</li>
+      </ul>
+    </div>
+    <div>
+      <ul class="tick">
+        <li><b>Backup &amp; recovery</b> — <code class="ic">mysqldump</code>, binlogs. Practice restoring once.</li>
+        <li><b>Transactions in depth</b> — isolation levels, locking, deadlocks.</li>
+        <li><b>Query optimization</b> — <code class="ic">EXPLAIN ANALYZE</code>, the <code class="ic">sys</code> schema.</li>
+        <li><b>Beyond MySQL</b> — PostgreSQL, and how ORMs translate your SQL.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="co deep" style="margin-top:26px"><div class="cot">🎓 You made it</div>
+    <p>Sixteen chapters ago, <code class="ic">SHOW DATABASES;</code> was the whole world. You can now design schemas with real constraints, reshape data with joins and subqueries, guard it with transactions, present it with views and CASE-driven reports, and make it fast with indexes — then prove it all in three projects. Keep the notebooks; rerun a chapter a week. <b>The database defends itself — and now, so do you.</b></p>
+  </div>
+
+  <footer class="pfoot"><span>SQL Masterclass · Cheatsheet &amp; Graduation</span><span class="fp">Page 23 · 23</span></footer>
+</section>
+
+<a class="navhome" href="#index">⌂ INDEX</a>
+
+<script>
+/* tiny SQL syntax highlighter — keywords, functions, strings, numbers, comments */
+(function () {
+  var KW = 'SELECT|FROM|WHERE|AND|OR|NOT|IN|IS|NULL|LIKE|BETWEEN|AS|ORDER|GROUP|BY|HAVING|LIMIT|OFFSET|ASC|DESC|JOIN|INNER|LEFT|RIGHT|CROSS|OUTER|ON|UNION|ALL|DISTINCT|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|TABLE|DATABASE|VIEW|INDEX|ALTER|ADD|MODIFY|CHANGE|COLUMN|RENAME|TO|DROP|TRUNCATE|PRIMARY|KEY|FOREIGN|REFERENCES|CONSTRAINT|UNIQUE|DEFAULT|AUTO_INCREMENT|ENUM|UNSIGNED|BOOLEAN|TRUE|FALSE|USE|SHOW|TABLES|DATABASES|FULL|DESCRIBE|START|TRANSACTION|COMMIT|ROLLBACK|SAVEPOINT|BEGIN|CASE|WHEN|THEN|ELSE|END|CASCADE|RESTRICT|IF|EXISTS|EXPLAIN|ANALYZE|ANY|COUNT|PARTITION|OVER|GRANT|REVOKE';
+  var FN = 'COUNT|SUM|MIN|MAX|AVG|IFNULL|COALESCE|NULLIF|ANY_VALUE|CONCAT|FLOOR|CEIL|ROUND|RAND|ELT|LPAD|RPAD|DATE_FORMAT|DATE_SUB|DATE_ADD|CURDATE|NOW|YEAR|MONTH|DAY';
+  var RX = new RegExp(
+    '(--[^\n]*|#[^\n]*)' +                                  // 1 comments
+    '|(\'(?:[^\']|\'\')*\'|"(?:[^"]|"")*")' +               // 2 strings
+    '|\\b(\\d+(?:\\.\\d+)?)\\b' +                           // 3 numbers
+    '|\\b(' + KW + ')\\b' +                                 // 4 keywords
+    '|\\b(' + FN + ')(?=\\s*\\()',                          // 5 functions
+    'gi');
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  document.querySelectorAll('pre.sql').forEach(function (el) {
+    var src = esc(el.textContent);
+    el.innerHTML = src.replace(RX, function (m, cm, st, nu, kw, fn) {
+      if (cm) return '<span class="cm">' + cm + '</span>';
+      if (st) return '<span class="st">' + st + '</span>';
+      if (nu) return '<span class="nu">' + nu + '</span>';
+      if (kw) return '<span class="kw">' + kw + '</span>';
+      if (fn) return '<span class="fn">' + fn + '</span>';
+      return m;
+    });
+  });
+})();
+</script>
+</body>
+</html>

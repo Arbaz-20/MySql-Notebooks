@@ -20,18 +20,47 @@ A collection of MySQL lecture notebooks created and run using the **MySQL Shell 
 
 ## What's in this repo
 
+Each lecture lives in its own folder with the notebook and a `README.md` summarizing what the lecture covers:
+
+| Folder | Notebook | Topics |
+|--------|----------|--------|
+| [Lecture 1](Lecture%201/README.md) | `Lecture 1.mysql-notebook` | CREATE DATABASE/TABLE, INSERT, UPDATE, DELETE, ALTER, TRUNCATE, DROP |
+| [Lecture 2](Lecture%202/README.md) | `Lecture 2.mysql-notebook` | Bulk seeding (~127 rows), SELECT, WHERE, LIKE, IN, LIMIT/OFFSET |
+| [Lecture 3](Lecture%203/README.md) | `Lecture 3.mysql-notebook` | Combined AND/OR/NOT filters, ORDER BY, sort + filter + paging |
+| [Lecture 4](Lecture%204/README.md) | `Lecture 4.mysql-notebook` | COUNT/SUM/MIN/MAX/AVG, GROUP BY, HAVING, ANY_VALUE, transactions |
+| [Lecture 5](Lecture%205/README.md) | `Lecture 5.mysql-notebook` | Subqueries, `orders` table, bulk data generation, INNER/LEFT/RIGHT joins |
+| [Lecture 6](Lecture%206/README.md) | `Lecture 6.mysql-notebook` | Address table, foreign keys, EXPLAIN, indexes, first view |
+| [Lecture 7](Lecture%207/README.md) | `Lecture 7.mysql-notebook` | Three-table joins, many-to-many, views, CASE reporting, IFNULL |
+
 ```
 MySql Notebooks/
-├── Lecture 1.mysql-notebook   # Basics: CREATE DATABASE, CREATE TABLE, INSERT
-├── Lecture 2.mysql-notebook   # SELECT, WHERE, ORDER BY
-├── Lecture 3.mysql-notebook   # Joins and relationships
-├── Lecture 4.mysql-notebook   # Aggregations, GROUP BY, HAVING
-├── Lecture 5.mysql-notebook   # Subqueries / advanced filtering
-├── Lecture 6.mysql-notebook   # Functions, views, stored procedures
+├── Lecture 1/
+│   ├── Lecture 1.mysql-notebook
+│   └── README.md
+├── Lecture 2/
+│   ├── Lecture 2.mysql-notebook
+│   └── README.md
+├── Lecture 3/
+│   ├── Lecture 3.mysql-notebook
+│   └── README.md
+├── Lecture 4/
+│   ├── Lecture 4.mysql-notebook
+│   └── README.md
+├── Lecture 5/
+│   ├── Lecture 5.mysql-notebook
+│   └── README.md
+├── Lecture 6/
+│   ├── Lecture 6.mysql-notebook
+│   └── README.md
+├── Lecture 7/
+│   ├── Lecture 7.mysql-notebook
+│   └── README.md
+├── SQL-Masterclass.html        # Full written guide (16 chapters + 3 projects)
+├── SQL-Masterclass.pdf         # Same guide as PDF
 └── README.md
 ```
 
-Each `.mysql-notebook` file is a notebook-style document (similar to a Jupyter notebook) where SQL statements are organized in cells. You can execute cells one at a time and see the result table inline.
+Each `.mysql-notebook` file is a notebook-style document (similar to a Jupyter notebook) where SQL statements are organized in cells. You can execute cells one at a time and see the result table inline. Each lecture folder's `README.md` explains that lecture's concepts, key queries, and the lessons hidden in it — start there before opening a notebook.
 
 ---
 
@@ -113,7 +142,7 @@ Your new connection tile now shows up under **DATABASE CONNECTIONS**. Double-cli
 ### Option A — Open the whole folder
 
 1. In VS Code: **File → Open Folder…** → select the `MySql Notebooks` folder.
-2. In the Explorer sidebar (`Ctrl+Shift+E`) you'll see all six `.mysql-notebook` files.
+2. In the Explorer sidebar (`Ctrl+Shift+E`) you'll see the seven `Lecture N/` folders, each holding its `.mysql-notebook` file and a `README.md`.
 3. **Double-click any `Lecture N.mysql-notebook`** file — VS Code automatically opens it in the MySQL notebook editor (because the extension registers a handler for this file type).
 
 ### Option B — Open a single file
@@ -146,7 +175,7 @@ When a notebook is open you'll see:
 
 ### Recommended order
 
-Run the lectures in numerical order (Lecture 1 → Lecture 6). Earlier notebooks create databases and tables that later ones may rely on.
+Run the lectures in numerical order (Lecture 1 → Lecture 7). Earlier notebooks create databases and tables that later ones may rely on.
 
 ### Selecting a default schema
 
