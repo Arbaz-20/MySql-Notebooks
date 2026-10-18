@@ -1,6 +1,8 @@
-# MySQL Notebooks — Practice Repository
+# MySQL Notebooks: Practice Repository
 
-A collection of MySQL lecture notebooks created and run using the **MySQL Shell for VS Code** extension. This README explains how to install the extension, connect to a MySQL server, open these `.mysql-notebook` files, and run the commands.
+A collection of MySQL lecture notebooks. Each lecture is a plain **`.sql` file** that opens as a notebook in VS Code with the **SQL Notebook** extension, with **one query per cell**, so you can run the queries one at a time and see each result table inline.
+
+This README explains how to install the extension, connect to a MySQL server, open the `.sql` notebooks, and run them.
 
 ---
 
@@ -9,72 +11,52 @@ A collection of MySQL lecture notebooks created and run using the **MySQL Shell 
 1. [What's in this repo](#whats-in-this-repo)
 2. [Prerequisites](#prerequisites)
 3. [Install MySQL Server](#1-install-mysql-server)
-4. [Install the MySQL Shell for VS Code extension](#2-install-the-mysql-shell-for-vs-code-extension)
+4. [Install the SQL Notebook extension](#2-install-the-sql-notebook-extension)
 5. [Create a database connection](#3-create-a-database-connection)
-6. [Open the notebooks from this repo](#4-open-the-notebooks-from-this-repo)
-7. [Running commands in a notebook](#5-running-commands-in-a-notebook)
-8. [Useful keyboard shortcuts](#6-useful-keyboard-shortcuts)
+6. [Open a lecture as a notebook](#4-open-a-lecture-as-a-notebook)
+7. [Running queries](#5-running-queries)
+8. [How the .sql files are structured](#6-how-the-sql-files-are-structured)
 9. [Troubleshooting](#7-troubleshooting)
 
 ---
 
 ## What's in this repo
 
-Each lecture lives in its own folder with the notebook and a `README.md` summarizing what the lecture covers:
+Each lecture lives in its own folder with its notebook (`Lecture N.sql`) and a `README.md` that explains **every query** in that notebook (the `-- Q<n>` tag in each cell matches the numbering in the README):
 
-| Folder | Notebook | Topics |
-|--------|----------|--------|
-| [Lecture 1](Lecture%201/README.md) | `Lecture 1.mysql-notebook` | CREATE DATABASE/TABLE, INSERT, UPDATE, DELETE, ALTER, TRUNCATE, DROP |
-| [Lecture 2](Lecture%202/README.md) | `Lecture 2.mysql-notebook` | Bulk seeding (~127 rows), SELECT, WHERE, LIKE, IN, LIMIT/OFFSET |
-| [Lecture 3](Lecture%203/README.md) | `Lecture 3.mysql-notebook` | Combined AND/OR/NOT filters, ORDER BY, sort + filter + paging |
-| [Lecture 4](Lecture%204/README.md) | `Lecture 4.mysql-notebook` | COUNT/SUM/MIN/MAX/AVG, GROUP BY, HAVING, ANY_VALUE, transactions |
-| [Lecture 5](Lecture%205/README.md) | `Lecture 5.mysql-notebook` | Subqueries, `orders` table, bulk data generation, INNER/LEFT/RIGHT joins |
-| [Lecture 6](Lecture%206/README.md) | `Lecture 6.mysql-notebook` | Address table, foreign keys, EXPLAIN, indexes, first view |
-| [Lecture 7](Lecture%207/README.md) | `Lecture 7.mysql-notebook` | Three-table joins, many-to-many, views, CASE reporting, IFNULL |
+| Folder | Queries | Topics |
+|--------|---------|--------|
+| [Lecture 1](Lecture%201/README.md) | 29 | `CREATE TABLE`, `INSERT`, `SELECT`, `UPDATE`, `DELETE`, `ALTER`, `TRUNCATE`, `DROP` |
+| [Lecture 2](Lecture%202/README.md) | 44 | Bulk seeding (about 126 rows), projection, `WHERE`, `AND`/`OR`/`NOT`, `IN`, `LIKE`, `LIMIT`/`OFFSET` |
+| [Lecture 3](Lecture%203/README.md) | 17 | Prefix `LIKE` combined with `AND`/`OR`/`NOT LIKE`, `ORDER BY`, filter + sort + page |
+| [Lecture 4](Lecture%204/README.md) | 65 | `COUNT`/`SUM`/`MIN`/`MAX`/`AVG` and `NULL`, `GROUP BY`, `HAVING`, `ANY_VALUE`, transactions |
+| [Lecture 5](Lecture%205/README.md) | 50 | Subqueries, `orders` table, recursive-CTE data generation, `INNER`/`LEFT`/`RIGHT` joins, `UNION` |
+| [Lecture 6](Lecture%206/README.md) | 51 | `address` table, foreign keys, three-table joins, `EXPLAIN`, indexes, first view |
+| [Lecture 7](Lecture%207/README.md) | 46 | Views over joins, CTE, many-to-many, `CASE` reporting, `IFNULL` |
 
 ```
 MySql Notebooks/
 ├── Lecture 1/
-│   ├── Lecture 1.mysql-notebook
-│   └── README.md
-├── Lecture 2/
-│   ├── Lecture 2.mysql-notebook
-│   └── README.md
-├── Lecture 3/
-│   ├── Lecture 3.mysql-notebook
-│   └── README.md
-├── Lecture 4/
-│   ├── Lecture 4.mysql-notebook
-│   └── README.md
-├── Lecture 5/
-│   ├── Lecture 5.mysql-notebook
-│   └── README.md
-├── Lecture 6/
-│   ├── Lecture 6.mysql-notebook
-│   └── README.md
-├── Lecture 7/
-│   ├── Lecture 7.mysql-notebook
-│   └── README.md
-├── SQL-Masterclass.html        # Full written guide (16 chapters + 3 projects)
-├── SQL-Masterclass.pdf         # Same guide as PDF
+│   ├── Lecture 1.sql               # open with SQL Notebook
+│   └── README.md                   # query-by-query explanation
+├── Lecture 2/ ... Lecture 7/       # same layout
+├── docs/
+│   ├── SQL-Masterclass.html        # full written guide (16 chapters + 3 projects)
+│   └── SQL-Masterclass.pdf         # same guide as PDF
 └── README.md
 ```
 
-Each `.mysql-notebook` file is a notebook-style document (similar to a Jupyter notebook) where SQL statements are organized in cells. You can execute cells one at a time and see the result table inline. Each lecture folder's `README.md` explains that lecture's concepts, key queries, and the lessons hidden in it — start there before opening a notebook.
+These notebooks were originally written in the MySQL Shell for VS Code format (`.mysql-notebook`) and converted to `.sql`. Row counts and errors quoted as "the saved run" in the lecture READMEs come from those original runs. The old files, with their saved results, are still in the git history (commit `ed34e1e` and earlier).
 
 ---
 
 ## Prerequisites
 
-You need three things installed:
-
 | Tool | Purpose | Download |
 |------|---------|----------|
 | **VS Code** | Editor | https://code.visualstudio.com/ |
-| **MySQL Server 8.0+** | The database engine these notebooks connect to | https://dev.mysql.com/downloads/mysql/ |
-| **MySQL Shell 8.0+** | Required by the VS Code extension | Bundled with MySQL Installer, or https://dev.mysql.com/downloads/shell/ |
-
-> On Windows, the easiest path is the **MySQL Installer for Windows** — it installs MySQL Server, MySQL Shell, and Workbench together.
+| **MySQL Server 8.0+** | The database engine the notebooks run against | https://dev.mysql.com/downloads/mysql/ |
+| **SQL Notebook** extension (by `cmoog`) | Opens `.sql` files as notebooks and runs each cell | VS Code Marketplace |
 
 ---
 
@@ -83,147 +65,140 @@ You need three things installed:
 ### Windows (recommended path)
 
 1. Download **MySQL Installer for Windows** from https://dev.mysql.com/downloads/installer/
-2. Run the installer and choose the **Developer Default** setup type — this includes Server, Shell, Workbench, and connectors.
+2. Choose the **Developer Default** or **Server only** setup type.
 3. During configuration:
-   - Authentication method: **Use Strong Password Encryption** (default).
-   - Set a **root password** — write it down, you'll need it later.
+   - Set a **root password** and write it down.
    - Keep the default port `3306`.
    - Tick **Start the MySQL Server at System Startup**.
 4. Finish the installer.
 
 ### Verify the server is running
 
-Open PowerShell and run:
-
-```powershell
+```bash
 mysql -u root -p
 ```
 
 Enter your root password. If you get the `mysql>` prompt, the server works. Type `exit;` to leave.
 
+### Create the practice database
+
+All lectures work inside a schema called `maqbool`:
+
+```sql
+CREATE DATABASE maqbool;
+```
+
 ---
 
-## 2. Install the MySQL Shell for VS Code extension
+## 2. Install the SQL Notebook extension
 
 1. Open VS Code.
 2. Open the **Extensions** sidebar (`Ctrl+Shift+X`).
-3. Search for **`MySQL Shell for VS Code`** (publisher: **Oracle**).
+3. Search for **`SQL Notebook`** (publisher: **cmoog**, id `cmoog.sqlnotebook`).
 4. Click **Install**.
-5. After installation, a new **DB** icon appears in the left activity bar — this is the extension's main panel.
-
-> The extension requires MySQL Shell to be installed on your machine. If it complains on first launch, install MySQL Shell from the link in [Prerequisites](#prerequisites) and reload VS Code.
+5. A **SQL NOTEBOOK** panel appears in the Explorer sidebar. That's where you manage connections.
 
 ---
 
 ## 3. Create a database connection
 
-1. Click the **DB icon** in the activity bar (left side of VS Code).
-2. In the **DATABASE CONNECTIONS** panel, click the **`+`** button (or right-click → *New Connection*).
-3. Fill in the connection form:
+1. In the **SQL NOTEBOOK** panel, click **+** (*New SQL Connection*).
+2. Fill in the form:
 
    | Field | Value |
    |-------|-------|
-   | Caption | `Local MySQL` (any label you want) |
-   | Hostname | `localhost` |
+   | Display name | `Local MySQL` (any label) |
+   | Database driver | `mysql` |
+   | Host | `localhost` |
    | Port | `3306` |
-   | Username | `root` |
-   | Schema | *(leave blank, or type the database you want as default)* |
-   | Password | Click **Store Password in Vault** and enter your root password |
+   | User | `root` |
+   | Password | your root password |
+   | Database | `maqbool` |
 
-4. Click **Test Connection** — you should see a green success message.
-5. Click **OK** to save.
-
-Your new connection tile now shows up under **DATABASE CONNECTIONS**. Double-click it to open a session.
+3. Click **Create**, then click the new connection in the panel to **connect**. A connected connection is marked as active.
 
 ---
 
-## 4. Open the notebooks from this repo
+## 4. Open a lecture as a notebook
 
-### Option A — Open the whole folder
-
-1. In VS Code: **File → Open Folder…** → select the `MySql Notebooks` folder.
-2. In the Explorer sidebar (`Ctrl+Shift+E`) you'll see the seven `Lecture N/` folders, each holding its `.mysql-notebook` file and a `README.md`.
-3. **Double-click any `Lecture N.mysql-notebook`** file — VS Code automatically opens it in the MySQL notebook editor (because the extension registers a handler for this file type).
-
-### Option B — Open a single file
-
-1. **File → Open File…** and pick a `.mysql-notebook` file directly.
-
-> If a notebook opens as plain JSON text instead of the notebook UI, the extension isn't installed correctly. Reinstall the **MySQL Shell for VS Code** extension and reload the window (`Ctrl+Shift+P` → *Developer: Reload Window*).
+1. **File → Open Folder…** and select the `MySql Notebooks` folder.
+2. In the Explorer, right-click **`Lecture N/Lecture N.sql`**, then **Open With…**, then **SQL Notebook**.
+   (A normal double-click opens it as a plain SQL text file, which is also fine for reading.)
+3. To always open `.sql` files as notebooks, choose **Configure default editor for '*.sql'…** in the same *Open With* menu.
 
 ---
 
-## 5. Running commands in a notebook
+## 5. Running queries
 
-When a notebook is open you'll see:
-
-- A **connection picker** at the top — click it and select **`Local MySQL`** (or whatever you named your connection). The notebook needs an active connection to execute anything.
-- **Code cells** containing SQL statements.
-- A small toolbar on each cell with **Run** / **Run All** buttons.
-
-### Running a single statement
-
-- Place the cursor inside a SQL statement and press **`Ctrl+Enter`** — runs the current statement and shows the result table below the cell.
-
-### Running everything in a cell
-
-- Click the ▶ button on the left of the cell, or press **`Shift+Enter`**.
-
-### Running the whole notebook
-
-- Click **Run All** at the top of the editor, or use the command palette: `Ctrl+Shift+P` → *Notebook: Run All*.
-
-### Recommended order
-
-Run the lectures in numerical order (Lecture 1 → Lecture 7). Earlier notebooks create databases and tables that later ones may rely on.
-
-### Selecting a default schema
-
-Many notebooks start with:
-
-```sql
-USE some_database;
-```
-
-Make sure that statement runs successfully before executing later cells, otherwise queries will error with `No database selected`.
-
----
-
-## 6. Useful keyboard shortcuts
+- Each **code cell holds exactly one query**, so run them one at a time.
+- Run a cell with the ▶ button to its left, or press **`Ctrl+Enter`**. **`Shift+Enter`** runs the cell and moves to the next one.
+- The result table appears directly under the cell.
+- The **markdown cells** (section headings) in between just organise the lecture; they don't run.
+- Run each lecture **top to bottom**, and the lectures **in order (1 → 7)**. Later lectures depend on tables and data created earlier. Each lecture README lists its prerequisites.
+- Results are not saved into the `.sql` file. Only the SQL text is stored.
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+Enter` | Run current SQL statement |
-| `Shift+Enter` | Run current cell, move to next |
-| `Ctrl+Shift+P` | Command palette (search for *MySQL* commands) |
-| `Ctrl+S` | Save the notebook (results are saved with it) |
-| `Ctrl+/` | Toggle SQL line comment |
+| `Ctrl+Enter` | Run the current cell |
+| `Shift+Enter` | Run the current cell and select the next |
+| `Ctrl+/` | Toggle a SQL line comment |
+| `Ctrl+S` | Save the notebook (writes the `.sql` file) |
+
+---
+
+## 6. How the .sql files are structured
+
+SQL Notebook stores a notebook as an ordinary `.sql` file:
+
+- **A blank line separates cells.** Each query is written with no blank lines inside it, followed by one blank line.
+- **Markdown cells** are written as `/*markdown ... */` comments.
+- Each code cell starts with a `-- Q<n>` comment that links it to the explanation in the lecture README.
+
+```sql
+/*markdown
+## Insert and read rows
+*/
+
+-- Q9
+SELECT * from maqbool_info;
+
+-- Q10
+INSERT INTO maqbool_info(
+name,
+age
+...
+```
+
+Because the file is plain SQL, you can also run it with any other client (MySQL Workbench, `mysql < "Lecture 1.sql"`, etc.).
 
 ---
 
 ## 7. Troubleshooting
 
-**"No active connection" when running a cell**
-Click the connection picker at the top of the notebook and choose your saved connection.
+**The file opens as plain text, not as a notebook**
+Use right-click → **Open With…** → **SQL Notebook**. If that option is missing, the extension isn't installed or enabled.
+
+**"No active connection" / nothing happens when running a cell**
+Click your connection in the **SQL NOTEBOOK** panel to connect it first.
 
 **`Access denied for user 'root'@'localhost'`**
-The password stored in the connection is wrong. Right-click the connection → *Edit Connection* → re-enter the password and tick *Store Password in Vault*.
+The password in the connection is wrong. Delete the connection and create it again.
 
-**`Unknown database 'xxx'`**
-Run `CREATE DATABASE xxx;` first, then `USE xxx;`. The earlier lecture notebooks contain the `CREATE DATABASE` statements — make sure you ran them.
+**`No database selected` (Error 1046)**
+Run the `USE maqbool;` cell near the top of the lecture, or set **Database** to `maqbool` in the connection.
 
-**Notebook opens as raw JSON**
-The extension is missing. Install **MySQL Shell for VS Code** (Oracle) and reload the window.
+**`Unknown database 'maqbool'`**
+Run `CREATE DATABASE maqbool;` first.
 
-**`MySQL Shell not found`**
-Install MySQL Shell from https://dev.mysql.com/downloads/shell/ and restart VS Code. On Windows make sure `mysqlsh.exe` is on your `PATH`.
+**`Table ... already exists` / `Duplicate column name`**
+You've already run that `CREATE` / `ALTER` cell. Skip it and continue.
 
 **Server isn't running**
-Open *Services* (`services.msc` on Windows) → find **MySQL80** → right-click → *Start*.
+Open *Services* (`services.msc` on Windows), find **MySQL80**, right-click it and choose *Start*.
 
 ---
 
 ## Notes
 
-- All commands in these notebooks were written while learning MySQL — they are practice exercises, not production code.
-- Feel free to edit cells, rerun them, and experiment.
+- All queries were written while learning MySQL. They are practice exercises, not production code, and the lecture READMEs point out the mistakes and traps you can learn from.
+- Feel free to edit cells, rerun them, and experiment. Just keep a blank line between cells.
